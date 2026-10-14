@@ -1,0 +1,6 @@
+{
+  "name": "Xưởng Triết Lý",
+  "description": "Bảng điều khiển dây chuyền sản xuất video triết lý 16:9 và 9:16 tại xưởng máy nhà.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

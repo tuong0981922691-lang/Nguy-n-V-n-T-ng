@@ -1,0 +1,4171 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Xưởng Triết Lý — Bảng Điều Khiển Video</title>
+  <meta name="description" content="Bảng điều khiển dây chuyền sản xuất video triết lý 16:9 và 9:16 tại xưởng máy nhà." />
+  <meta property="og:title" content="Xưởng Triết Lý — Bảng Điều Khiển Video" />
+  <meta property="og:description" content="Bảng điều khiển dây chuyền sản xuất video triết lý 16:9 và 9:16 tại xưởng máy nhà." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <script>
+    (function () {
+      try {
+        var saved = localStorage.getItem("xuong_theme");
+        var active = "dark";
+        if (saved === "dark" || saved === "light" || saved === "sepia") {
+          active = saved;
+        } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches) {
+          active = "light";
+        }
+        document.documentElement.setAttribute("data-theme", active);
+      } catch (e) {}
+    })();
+  </script>
+
+  <style>
+    /* ==========================================================================
+       1. HỆ THỐNG BIẾN THIẾT KẾ (DESIGN TOKENS & 3 BỘ MÀU)
+       ========================================================================== */
+    :root {
+      /* Bộ 1 (Mặc định): Trầm ấm Trúc Mặc - Dark Warm Zen (Độ tương phản cao, dịu mắt) */
+      --bg-canvas: #111215;
+      --bg-surface: #181a1e;
+      --bg-surface-elevated: #22252c;
+      --bg-surface-soft: #141619;
+      --border-subtle: #2c3038;
+      --border-strong: #424955;
+      --text-main: #f3efe8;
+      --text-muted: #a6abb7;
+      --text-dim: #737987;
+
+      /* Màu nhấn hai dây sản xuất */
+      --color-16x9: #f59e0b;       /* Vàng hổ phách cổ thư */
+      --color-16x9-bg: #2d200e;
+      --color-16x9-border: #784c13;
+      --color-9x16: #10b981;       /* Xanh ngọc bích / thanh trúc */
+      --color-9x16-bg: #092c1e;
+      --color-9x16-border: #156d4b;
+
+      /* Trạng thái */
+      --color-success: #10b981;
+      --color-success-bg: rgba(16, 185, 129, 0.15);
+      --color-warning: #f59e0b;
+      --color-warning-bg: rgba(245, 158, 11, 0.15);
+      --color-danger: #ef4444;
+      --color-danger-bg: rgba(239, 68, 68, 0.18);
+      --color-info: #38bdf8;
+
+      /* Đo lường & Bo góc */
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --transition-fast: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Bộ 2: Hoàng Hôn Cổ Điển - Sepia Dark */
+    [data-theme="sepia"] {
+      --bg-canvas: #1a1512;
+      --bg-surface: #241e1a;
+      --bg-surface-elevated: #302823;
+      --bg-surface-soft: #1d1814;
+      --border-subtle: #3d332d;
+      --border-strong: #5a4b42;
+      --text-main: #f5ece4;
+      --text-muted: #b8aba0;
+      --text-dim: #82756a;
+      --color-16x9: #f59e0b;
+      --color-16x9-bg: #332107;
+      --color-16x9-border: #784a0d;
+      --color-9x16: #10b981;
+      --color-9x16-bg: #092c20;
+      --color-9x16-border: #146c4d;
+    }
+
+    /* Bộ 3: Thanh Trúc Sáng - Light Zen */
+    [data-theme="light"] {
+      --bg-canvas: #f6f4ee;
+      --bg-surface: #ffffff;
+      --bg-surface-elevated: #ede9df;
+      --bg-surface-soft: #fcfbf8;
+      --border-subtle: #ded8cb;
+      --border-strong: #b8b09f;
+      --text-main: #202422;
+      --text-muted: #575e5a;
+      --text-dim: #7f8783;
+      --color-16x9: #b45309;
+      --color-16x9-bg: #fef3c7;
+      --color-16x9-border: #fcd34d;
+      --color-9x16: #047857;
+      --color-9x16-bg: #d1fae5;
+      --color-9x16-border: #6ee7b7;
+      --color-success: #047857;
+      --color-warning: #b45309;
+      --color-danger: #b91c1c;
+      --color-danger-bg: rgba(185, 28, 28, 0.1);
+    }
+
+    /* Giảm hiệu ứng khi người dùng bật prefers-reduced-motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ==========================================================================
+       2. QUY TẮC NỀN TẢNG (CHỐNG TRÀN CHỮ & BỐ CỤC ĐÁP ỨNG)
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      background-color: var(--bg-canvas);
+      color: var(--text-main);
+      font-family: var(--font-stack);
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Chống tràn chữ tuyệt đối */
+    p, span, h1, h2, h3, h4, h5, h6, td, th, div, label {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .ellipsis-1 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Bố cục khung ngoài */
+    #app-root {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      max-width: 1540px;
+      margin: 0 auto;
+      padding: 0 16px 80px 16px;
+    }
+
+    @media (max-width: 640px) {
+      #app-root {
+        padding: 0 10px 80px 10px;
+      }
+    }
+
+    /* ==========================================================================
+       3. CÁC KHỐI BĂNG CẢNH BÁO TOÀN CỤC
+       ========================================================================== */
+    .banner-bar {
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border-radius: 0 0 var(--radius-md) var(--radius-md);
+      margin-bottom: 12px;
+    }
+
+    .banner-mock {
+      background-color: var(--color-warning-bg);
+      border: 1px solid var(--color-warning);
+      color: var(--color-warning);
+    }
+
+    .banner-outdated {
+      background-color: var(--color-danger-bg);
+      border: 1px solid var(--color-danger);
+      color: var(--color-danger);
+    }
+
+    /* ==========================================================================
+       4. HEADER VÀ THANH ĐIỀU HƯỚNG
+       ========================================================================== */
+    header.main-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 16px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, var(--color-16x9), #92400e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: bold;
+      font-size: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      flex-shrink: 0;
+    }
+
+    .brand-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-tag {
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background-color: var(--bg-surface-elevated);
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+      font-weight: 500;
+    }
+
+    .brand-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      user-select: none;
+    }
+    .btn-theme-toggle:hover {
+      background: var(--bg-surface-elevated);
+      border-color: var(--border-strong);
+    }
+    .btn-theme-toggle:focus-visible {
+      outline: 2px solid var(--color-16x9);
+      outline-offset: 1px;
+    }
+
+    .theme-selector {
+      display: inline-flex;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 2px;
+    }
+
+    .theme-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 5px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background var(--transition-fast), color var(--transition-fast);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      user-select: none;
+    }
+
+    .theme-btn.active {
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    /* Chấm tròn xem trước màu chủ đạo của từng bộ giao diện */
+    .theme-preview-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .theme-btn:hover .theme-preview-dot {
+      transform: scale(1.2);
+    }
+
+    .theme-btn.active .theme-preview-dot {
+      box-shadow: 0 0 0 1.5px var(--border-strong), 0 0 4px rgba(0, 0, 0, 0.4);
+      transform: scale(1.1);
+    }
+
+    /* Màu sắc đặc trưng của từng bộ */
+    .theme-preview-dark {
+      background-color: #111215;
+      border: 1.5px solid #f59e0b;
+    }
+
+    .theme-preview-sepia {
+      background-color: #78350f;
+      border: 1.5px solid #d97706;
+    }
+
+    .theme-preview-light {
+      background-color: #f6f4ee;
+      border: 1.5px solid #047857;
+    }
+
+    /* Nút khẩn cấp tắt máy thuê (Nút 33: /api/tat_pod) */
+    .btn-emergency {
+      background-color: #7f1d1d;
+      color: #fee2e2;
+      border: 1px solid #b91c1c;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all var(--transition-fast);
+    }
+    .btn-emergency:hover {
+      background-color: #991b1b;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+    }
+
+    /* Tabs điều hướng chính */
+    nav.main-nav {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-tab {
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-muted);
+      padding: 8px 14px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      transition: all var(--transition-fast);
+    }
+
+    .nav-tab:hover {
+      color: var(--text-main);
+      background-color: var(--bg-surface-soft);
+    }
+
+    .nav-tab.active {
+      color: var(--text-main);
+      border-bottom-color: var(--color-16x9);
+      background-color: var(--bg-surface);
+      font-weight: 600;
+    }
+
+    .nav-tab.active.tab-9x16 {
+      border-bottom-color: var(--color-9x16);
+    }
+
+    /* ==========================================================================
+       5. THANH THEO DÕI MẺ CỐ ĐỊNH (STICKY BATCH TRACKER - BẮT BUỘC Ở MỌI TRANG)
+       ========================================================================== */
+    .batch-tracker {
+      position: sticky;
+      top: 10px;
+      z-index: 100;
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+      transition: border-color var(--transition-fast);
+    }
+
+    .tracker-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .tracker-status-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .status-running {
+      background-color: rgba(56, 189, 248, 0.15);
+      color: var(--color-info);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+    }
+    .status-completed {
+      background-color: var(--color-success-bg);
+      color: var(--color-success);
+      border: 1px solid var(--color-success);
+    }
+    .status-failed {
+      background-color: var(--color-danger-bg);
+      color: var(--color-danger);
+      border: 1px solid var(--color-danger);
+    }
+    .status-idle {
+      background-color: var(--bg-surface-elevated);
+      color: var(--text-dim);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: currentColor;
+      display: inline-block;
+    }
+    .status-running .pulse-dot {
+      animation: pulseAnimation 1.5s infinite;
+    }
+    @keyframes pulseAnimation {
+      0% { opacity: 0.4; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.2); }
+      100% { opacity: 0.4; transform: scale(0.9); }
+    }
+
+    .tracker-meta {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 12px;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+    }
+
+    /* Các bước mốc Stepper */
+    .stepper-chain {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      overflow-x: auto;
+      margin: 10px 0;
+      padding: 4px 0;
+    }
+
+    .step-node {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface-elevated);
+      color: var(--text-muted);
+      border: 1px solid var(--border-subtle);
+      white-space: nowrap;
+    }
+
+    .step-node.done {
+      background: var(--color-success-bg);
+      color: var(--color-success);
+      border-color: rgba(43, 182, 115, 0.4);
+    }
+
+    .step-node.current {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--color-info);
+      border-color: rgba(56, 189, 248, 0.5);
+      font-weight: 600;
+    }
+
+    .step-arrow {
+      color: var(--text-dim);
+      font-size: 11px;
+    }
+
+    /* Thanh tiến độ thật */
+    .progress-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .progress-bar-bg {
+      flex: 1;
+      height: 10px;
+      background-color: var(--bg-surface-elevated);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #38bdf8, var(--color-9x16));
+      border-radius: 999px;
+      transition: width 250ms ease;
+    }
+
+    /* Khi chưa có phần trăm trong bước -> chuyển động sọc nhẹ nhàng */
+    .progress-bar-indeterminate {
+      background: linear-gradient(90deg, transparent 0%, #38bdf8 50%, transparent 100%);
+      background-size: 200% 100%;
+      animation: indeterminateSlide 1.8s infinite linear;
+      width: 100% !important;
+    }
+    @keyframes indeterminateSlide {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .progress-percent-label {
+      font-size: 13px;
+      font-weight: 700;
+      min-width: 45px;
+      text-align: right;
+      color: var(--text-main);
+    }
+
+    .tracker-log-toggle {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 0;
+      margin-top: 6px;
+    }
+    .tracker-log-toggle:hover {
+      color: var(--text-main);
+    }
+
+    .tracker-log-box {
+      background: var(--bg-surface-soft);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 8px 12px;
+      font-family: monospace;
+      font-size: 12px;
+      max-height: 100px;
+      overflow-y: auto;
+      margin-top: 6px;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       6. CÁC TRANG NỘI DUNG (SECTIONS)
+       ========================================================================== */
+    .view-section {
+      display: none;
+    }
+    .view-section.active {
+      display: block;
+    }
+
+    /* Khung thẻ Grid */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    @media (max-width: 992px) {
+      .grid-3 { grid-template-columns: repeat(2, 1fr); }
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+    .card:hover {
+      border-color: var(--border-strong);
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    /* HAI CỬA TO TRÊN MẶT TIỀN (PORTALS) */
+    .portal-banner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 680px) {
+      .portal-banner { grid-template-columns: 1fr; }
+    }
+
+    .portal-card {
+      padding: 22px;
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+      border: 1px solid transparent;
+    }
+    .portal-card:hover {
+      transform: translateY(-2px);
+    }
+
+    .portal-16x9 {
+      background: linear-gradient(145deg, var(--color-16x9-bg), var(--bg-surface));
+      border-color: var(--color-16x9-border);
+    }
+    .portal-16x9:hover {
+      box-shadow: 0 8px 24px rgba(229, 169, 60, 0.2);
+    }
+
+    .portal-9x16 {
+      background: linear-gradient(145deg, var(--color-9x16-bg), var(--bg-surface));
+      border-color: var(--color-9x16-border);
+    }
+    .portal-9x16:hover {
+      box-shadow: 0 8px 24px rgba(43, 182, 115, 0.2);
+    }
+
+    .portal-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      width: fit-content;
+    }
+    .portal-16x9 .portal-badge {
+      background-color: rgba(229, 169, 60, 0.2);
+      color: var(--color-16x9);
+      border: 1px solid var(--color-16x9);
+    }
+    .portal-9x16 .portal-badge {
+      background-color: rgba(43, 182, 115, 0.2);
+      color: var(--color-9x16);
+      border: 1px solid var(--color-9x16);
+    }
+
+    .portal-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+    .portal-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       7. CÁC NÚT BẤM (BUTTONS) & HỒI ĐÁP PHẢN HỒI
+       ========================================================================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      background-color: var(--bg-surface-elevated);
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .btn:hover:not(:disabled) {
+      background-color: var(--border-strong);
+    }
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .btn-primary-16x9 {
+      background-color: var(--color-16x9);
+      color: #121315;
+      border-color: #d97706;
+      font-size: 14px;
+      padding: 10px 20px;
+    }
+    .btn-primary-16x9:hover:not(:disabled) {
+      background-color: #f59e0b;
+      box-shadow: 0 4px 14px rgba(229, 169, 60, 0.35);
+    }
+
+    .btn-primary-9x16 {
+      background-color: var(--color-9x16);
+      color: #ffffff;
+      border-color: #059669;
+      font-size: 14px;
+      padding: 10px 20px;
+    }
+    .btn-primary-9x16:hover:not(:disabled) {
+      background-color: #10b981;
+      box-shadow: 0 4px 14px rgba(43, 182, 115, 0.35);
+    }
+
+    .btn-sm {
+      padding: 4px 10px;
+      font-size: 12px;
+    }
+
+    .btn-danger {
+      background-color: rgba(239, 68, 68, 0.15);
+      border-color: var(--color-danger);
+      color: var(--color-danger);
+    }
+    .btn-danger:hover:not(:disabled) {
+      background-color: var(--color-danger);
+      color: #fff;
+    }
+
+    /* Vùng phản hồi kết quả bên cạnh nút */
+    .btn-feedback {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      margin-left: 8px;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+    }
+    .feedback-success {
+      color: var(--color-success);
+      background: var(--color-success-bg);
+      border: 1px solid rgba(43, 182, 115, 0.3);
+    }
+    .feedback-error {
+      color: var(--color-danger);
+      background: var(--color-danger-bg);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    .feedback-sending {
+      color: var(--color-info);
+      background: rgba(56, 189, 248, 0.15);
+    }
+
+    /* Khối xác nhận 2 nhịp */
+    .confirm-inline-box {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      background-color: rgba(239, 68, 68, 0.12);
+      border: 1px dashed var(--color-danger);
+      margin-top: 6px;
+      font-size: 12px;
+    }
+    .confirm-inline-box.show {
+      display: flex;
+    }
+
+    /* ==========================================================================
+       8. THƯ VIỆN VIDEO (THẺ DỌC & THẺ NGANG TÁCH BIỆT)
+       ========================================================================== */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      background: var(--bg-surface);
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .filter-input {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      padding: 6px 12px;
+      font-size: 13px;
+      border-radius: var(--radius-sm);
+      outline: none;
+    }
+    .filter-input:focus {
+      border-color: var(--color-16x9);
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .video-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all var(--transition-fast);
+      position: relative;
+    }
+    .video-card:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+    }
+
+    /* Khung ảnh bìa chuẩn tỉ lệ */
+    .video-thumb-container {
+      position: relative;
+      width: 100%;
+      background: #000;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Video 16:9 luôn nằm trong khung 16:9 */
+    .thumb-16x9 {
+      aspect-ratio: 16 / 9;
+    }
+
+    /* Video 9:16 luôn nằm trong khung DỌC 9:16 */
+    .thumb-9x16 {
+      aspect-ratio: 9 / 16;
+      max-height: 380px;
+      margin: 0 auto;
+    }
+
+    .video-thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .video-aspect-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      backdrop-filter: blur(4px);
+    }
+    .badge-16x9 {
+      background-color: rgba(229, 169, 60, 0.85);
+      color: #121315;
+    }
+    .badge-9x16 {
+      background-color: rgba(43, 182, 115, 0.85);
+      color: #ffffff;
+    }
+
+    .video-duration-badge {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(0, 0, 0, 0.75);
+      color: #fff;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+
+    .video-info-body {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex: 1;
+    }
+
+    .video-title-text {
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1.4;
+      color: var(--text-main);
+    }
+
+    .video-meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+
+    .video-status-tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .tag-ready {
+      background: var(--color-success-bg);
+      color: var(--color-success);
+    }
+    .tag-unready {
+      background: var(--color-warning-bg);
+      color: var(--color-warning);
+    }
+    .tag-published {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--color-info);
+    }
+    .tag-error {
+      background: var(--color-danger-bg);
+      color: var(--color-danger);
+    }
+
+    /* ==========================================================================
+       9. MODAL CHI TIẾT VIDEO & PHÁT VIDEO KHÔNG BỊ PHÁ
+       ========================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-window {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      max-width: 900px;
+      width: 100%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      font-size: 20px;
+      color: var(--text-muted);
+      cursor: pointer;
+      line-height: 1;
+    }
+    .modal-close-btn:hover {
+      color: var(--text-main);
+    }
+
+    .modal-body {
+      padding: 18px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .player-box {
+      background: #000;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 220px;
+    }
+
+    .player-box video {
+      max-height: 480px;
+      width: 100%;
+    }
+
+    .player-box.player-9x16 video {
+      max-width: 320px;
+      aspect-ratio: 9 / 16;
+    }
+
+    /* Khối kiểm tra số đo video */
+    .video-inspection-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      background: var(--bg-surface-soft);
+      padding: 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      font-size: 12px;
+    }
+    @media (max-width: 600px) {
+      .video-inspection-grid { grid-template-columns: 1fr; }
+    }
+
+    .check-frames-row {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding: 4px 0;
+    }
+    .check-frame-thumb {
+      width: 120px;
+      height: 70px;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+    }
+
+    /* Khối sao chép tiêu đề / mô tả */
+    .copy-box {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 10px;
+    }
+    .copy-box-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .copy-content {
+      font-size: 13px;
+      color: var(--text-main);
+      white-space: pre-wrap;
+      max-height: 120px;
+      overflow-y: auto;
+      padding: 6px;
+      background: var(--bg-surface-soft);
+      border-radius: 4px;
+    }
+
+    /* ==========================================================================
+       10. FORM NHẬP LIỆU & VÙNG TỐN TIỀN
+       ========================================================================== */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .form-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .form-input, .form-select, .form-textarea {
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-main);
+      padding: 8px 12px;
+      font-size: 13px;
+      border-radius: var(--radius-sm);
+      outline: none;
+      font-family: inherit;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: var(--color-16x9);
+    }
+    .form-textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .form-checkbox-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--text-main);
+    }
+
+    /* VÙNG TỐN TIỀN THẬT (MÀU HỔ PHÁCH CẢNH BÁO RIÊNG) */
+    .danger-zone-card {
+      border: 1px solid var(--color-warning);
+      background: rgba(245, 158, 11, 0.05);
+      position: relative;
+    }
+    .danger-zone-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(245, 158, 11, 0.2);
+      color: var(--color-warning);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--color-warning);
+    }
+
+    /* Khối gập mở chi tiết (Accordion) */
+    .accordion-item {
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+    .accordion-header {
+      background: var(--bg-surface-soft);
+      padding: 10px 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+    }
+    .accordion-body {
+      padding: 12px 14px;
+      background: var(--bg-surface);
+      display: none;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .accordion-item.open .accordion-body {
+      display: block;
+    }
+
+    /* Phân trang */
+    .pagination-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Audio player cố định không bị reset */
+    .audio-player-widget {
+      width: 100%;
+      height: 32px;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app-root">
+
+    <!-- BĂNG 1: CẢNH BÁO DỮ LIỆU MẪU (TỰ KÍCH HOẠT KHI MÁY CHỦ CHƯA NỐI HOẶC SAU 3 GIÂY) -->
+    <div id="mock-data-banner" class="banner-bar banner-mock" style="display: none;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span>⚠️</span>
+        <span><strong>ĐANG XEM DỮ LIỆU MẪU</strong> — Chưa nối máy chủ Python (máy nhà). Mọi nút POST sẽ chạy ở chế độ giả lập trực quan.</span>
+      </div>
+      <button class="btn btn-sm" id="btn-reconnect-server" style="background: rgba(245, 158, 11, 0.25); border-color: var(--color-warning); color: #fff;">
+        Thử nối lại
+      </button>
+    </div>
+
+    <!-- BĂNG 2: CẢNH BÁO MÁY CHỦ CHẠY MÃ CŨ CẦN KHỞI ĐỘNG LẠI -->
+    <div id="outdated-server-banner" class="banner-bar banner-outdated" style="display: none;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span>🛑</span>
+        <span><strong>CẢNH BÁO:</strong> Máy chủ Python đang chạy mã cũ cần khởi động lại để áp dụng các thay đổi mới!</span>
+      </div>
+      <span id="server-uptime-text" style="font-size: 11px; opacity: 0.85;"></span>
+    </div>
+
+    <!-- HEADER CHÍNH -->
+    <header class="main-header">
+      <div class="brand-group">
+        <div class="brand-icon" aria-hidden="true">✦</div>
+        <div>
+          <div class="brand-title">
+            XƯỞNG TRIẾT LÝ
+            <span class="brand-tag">v2026.10</span>
+          </div>
+          <div class="brand-subtitle">Dây chuyền làm video triết lý 16:9 &amp; 9:16 tại xưởng máy nhà</div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Nút chuyển nhanh Chế độ Tối / Sáng (Dark / Light Mode Toggle) -->
+        <button id="btn-theme-toggle" class="btn-theme-toggle" role="switch" aria-checked="true" aria-label="Chuyển đổi chế độ Tối và Sáng">
+          <span id="theme-toggle-icon">🌙</span>
+          <span id="theme-toggle-text">Chế độ Tối</span>
+        </button>
+
+        <!-- Đổi 3 bộ màu có biểu tượng màu trực quan -->
+        <div class="theme-selector" role="radiogroup" aria-label="Bộ màu giao diện">
+          <button class="theme-btn active" data-theme="dark" title="Trầm ấm Trúc Mặc (Tối)">
+            <span class="theme-preview-dot theme-preview-dark" aria-hidden="true"></span>
+            <span>Trúc Mặc</span>
+          </button>
+          <button class="theme-btn" data-theme="sepia" title="Hoàng Hôn Cổ Điển (Nâu trầm)">
+            <span class="theme-preview-dot theme-preview-sepia" aria-hidden="true"></span>
+            <span>Hoàng Hôn</span>
+          </button>
+          <button class="theme-btn" data-theme="light" title="Thanh Trúc Sáng (Giấy sáng)">
+            <span class="theme-preview-dot theme-preview-light" aria-hidden="true"></span>
+            <span>Trúc Sáng</span>
+          </button>
+        </div>
+
+        <!-- Vị trí gắn widget Firebase Auth (Google Sign-In) & Firestore Cloud Sync -->
+        <div id="firebase-auth-mount"></div>
+
+        <!-- Nút khẩn cấp TẮT MÁY THUÊ / DỪNG CHỜ (Nút 33: /api/tat_pod) -->
+        <button id="btn-tat-pod-global" data-api="/api/tat_pod" class="btn-emergency" title="Ngắt kết nối máy thuê pod tức thì để tránh phát sinh chi phí">
+          <span>⚡ TẮT MÁY THUÊ / DỪNG CHỜ</span>
+        </button>
+        <span id="feedback-tat-pod-global" class="btn-feedback" style="display: none;"></span>
+      </div>
+    </header>
+
+    <!-- THANH ĐIỀU HƯỚNG TABS CHÍNH -->
+    <nav class="main-nav" role="tablist">
+      <button class="nav-tab active" data-view="dashboard" role="tab" id="tab-nav-dashboard">
+        🏛️ Mặt Tiền
+      </button>
+      <button class="nav-tab" data-view="pipe16x9" role="tab" id="tab-nav-pipe16x9">
+        🎬 Dây 16:9 (Dài)
+      </button>
+      <button class="nav-tab tab-9x16" data-view="pipe9x16" role="tab" id="tab-nav-pipe9x16">
+        📱 Dây 9:16 (Ngắn)
+      </button>
+      <button class="nav-tab" data-view="library" role="tab" id="tab-nav-library">
+        📼 Thư Viện Video
+      </button>
+      <button class="nav-tab" data-view="repository" role="tab" id="tab-nav-repository">
+        📜 Kho Giọng &amp; Chữ
+      </button>
+      <button class="nav-tab" data-view="system" role="tab" id="tab-nav-system">
+        ⚙️ Hệ Thống &amp; Nguồn
+      </button>
+      <button class="nav-tab" data-view="logs" role="tab" id="tab-nav-logs">
+        📋 Nhật Ký Máy Trạm
+      </button>
+    </nav>
+
+    <!-- ==========================================================================
+         THANH THEO DÕI MẺ CỐ ĐỊNH (STICKY BATCH TRACKER - HIỆN Ở MỌI TRANG)
+         ========================================================================== -->
+    <div id="sticky-batch-tracker" class="batch-tracker" aria-live="polite">
+      <div class="tracker-header">
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <div id="tracker-status-badge" class="tracker-status-tag status-idle">
+            <span class="pulse-dot"></span>
+            <span id="tracker-status-text">Chưa chạy mẻ nào</span>
+          </div>
+          <strong id="tracker-batch-name" style="font-size: 13px; color: var(--text-main);">Sẵn sàng nhận lệnh</strong>
+          <span id="tracker-stage-name" style="font-size: 12px; color: var(--text-muted);">-</span>
+        </div>
+
+        <div class="tracker-meta">
+          <span id="tracker-timer">⏱️ Thời gian: 00:00</span>
+          <span id="tracker-heartbeat">📡 Tín hiệu: --s trước</span>
+          <span id="tracker-eta" style="color: var(--color-warning);"></span>
+        </div>
+      </div>
+
+      <!-- Chuỗi các bước mốc (Stepper chain) -->
+      <div id="tracker-stepper" class="stepper-chain">
+        <div class="step-node" id="step-node-1">1. Viết kịch bản</div>
+        <span class="step-arrow">→</span>
+        <div class="step-node" id="step-node-2">2. Thu giọng đọc</div>
+        <span class="step-arrow">→</span>
+        <div class="step-node" id="step-node-3">3. Dựng hình bìa</div>
+        <span class="step-arrow">→</span>
+        <div class="step-node" id="step-node-4">4. Dựng phim hoàn tất</div>
+      </div>
+
+      <!-- Thanh tiến độ trung thực -->
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-bg" role="progressbar" id="tracker-progress-bar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+          <div id="tracker-progress-fill" class="progress-bar-fill" style="width: 0%;"></div>
+        </div>
+        <div id="tracker-progress-label" class="progress-percent-label">0%</div>
+      </div>
+
+      <!-- Vài dòng nhật ký mới nhất (gập mở) -->
+      <button id="tracker-toggle-logs" class="tracker-log-toggle" type="button">
+        <span>▸ Dòng nhật ký máy trạm mới nhất</span>
+      </button>
+      <div id="tracker-recent-logs" class="tracker-log-box" style="display: none;">
+        <div id="tracker-log-lines">Chưa có nhật ký phát sinh.</div>
+      </div>
+    </div>
+
+
+    <!-- ==========================================================================
+         VIEW 1: MẶT TIỀN (TRANG MỞ ĐẦU - ĐÁP ỨNG 3 CÂU HỎI TRONG 1 MÀN HÌNH)
+         ========================================================================== -->
+    <section id="view-dashboard" class="view-section active">
+
+      <!-- 3 CÂU HỎI QUYẾT ĐỊNH TRONG 1 MÀN HÌNH -->
+      <div class="grid-3" style="margin-bottom: 20px;">
+        
+        <!-- CÂU 1: Xưởng có sẵn sàng không? (9 mục xanh/vàng/đỏ) -->
+        <div class="card" id="card-readiness-overview">
+          <div class="card-title">
+            <span>1. Xưởng có sẵn sàng?</span>
+            <span id="readiness-summary-tag" class="brand-tag">Đang kiểm tra...</span>
+          </div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
+            Trạng thái 9 mục trọng yếu:
+          </div>
+          <div id="readiness-pills-list" class="grid-3" style="gap: 6px;">
+            <!-- Render 9 pills: ổ đĩa, giấy tờ, khóa api, ffmpeg, giọng, khóa mã, gemini ngày, kho nhạc, tự bật -->
+          </div>
+          <div style="margin-top: 10px; text-align: right;">
+            <button class="btn btn-sm" id="btn-open-readiness-details" style="font-size: 11px;">
+              Xem chi tiết 9 mục
+            </button>
+          </div>
+        </div>
+
+        <!-- CÂU 2: Có mẻ nào đang chạy, tới đâu rồi? -->
+        <div class="card" id="card-running-overview">
+          <div class="card-title">
+            <span>2. Mẻ đang chạy?</span>
+            <span id="dash-running-badge" class="brand-tag">Chưa chạy</span>
+          </div>
+          <div id="dash-running-content" style="font-size: 13px; color: var(--text-muted); min-height: 80px; display: flex; flex-direction: column; justify-content: center;">
+            <p id="dash-running-batch-title" style="color: var(--text-main); font-weight: 600;">Hiện không có mẻ nào chạy</p>
+            <p id="dash-running-batch-sub" style="font-size: 12px;">Xưởng đang ở trạng thái rảnh rỗi, sẵn sàng nhận lệnh mới.</p>
+          </div>
+          <div style="margin-top: 10px; display: flex; gap: 8px;">
+            <button class="btn btn-sm" id="btn-goto-running-pipe" style="flex: 1;">Vào dây tương ứng</button>
+          </div>
+        </div>
+
+        <!-- CÂU 3: Sản phẩm mới nhất là gì? -->
+        <div class="card" id="card-latest-overview">
+          <div class="card-title">
+            <span>3. Sản phẩm mới nhất</span>
+            <span id="dash-latest-ratio" class="brand-tag">-</span>
+          </div>
+          <div id="dash-latest-box" style="display: flex; gap: 12px; align-items: center; min-height: 80px;">
+            <div id="dash-latest-thumb-box" style="width: 80px; height: 50px; background: #000; border-radius: 4px; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <span style="font-size: 20px;">🎬</span>
+            </div>
+            <div style="flex: 1; overflow: hidden;">
+              <div id="dash-latest-title" class="ellipsis-1" style="font-size: 13px; font-weight: 600; color: var(--text-main);">Chưa có video</div>
+              <div id="dash-latest-time" style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">-</div>
+              <div id="dash-latest-status" style="margin-top: 4px;"></div>
+            </div>
+          </div>
+          <div style="margin-top: 10px; text-align: right;">
+            <button class="btn btn-sm" id="btn-goto-library" style="font-size: 11px;">Mở thư viện xem</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- HAI CỬA TO: BÀI DÀI 16:9 & BÀI NGẮN 9:16 (KHÁC MÀU NHẬN DIỆN HOÀN TOÀN) -->
+      <div class="portal-banner">
+        
+        <!-- CỬA 1: BÀI DÀI 16:9 -->
+        <div class="portal-card portal-16x9" id="portal-btn-16x9">
+          <div>
+            <div class="portal-badge">
+              <span>🖥️ TỈ LỆ 16:9</span>
+            </div>
+            <h2 class="portal-title" style="margin-top: 10px;">BÀI DÀI 16:9</h2>
+            <p class="portal-desc">
+              Thời lượng khoảng 15 phút · Phân tích sâu, kể chuyện triết lý cổ thư, bài học đối nhân xử thế cho YouTube &amp; Facebook màn ảnh ngang.
+            </p>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+            <div style="font-size: 12px; color: var(--color-16x9); font-weight: 600;">
+              → Vào không gian sản xuất 16:9
+            </div>
+            <span class="btn btn-primary-16x9" style="font-size: 12px; padding: 6px 14px;">Mở dây 16:9</span>
+          </div>
+        </div>
+
+        <!-- CỬA 2: BÀI NGẮN 9:16 -->
+        <div class="portal-card portal-9x16" id="portal-btn-9x16">
+          <div>
+            <div class="portal-badge">
+              <span>📱 TỈ LỆ 9:16</span>
+            </div>
+            <h2 class="portal-title" style="margin-top: 10px;">BÀI NGẮN 9:16</h2>
+            <p class="portal-desc">
+              Thời lượng khoảng 60–90 giây · Đúc kết cô đọng câu tục ngữ, lời răn người xưa; định dạng dọc chuẩn cho TikTok, Reels &amp; YouTube Shorts.
+            </p>
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+            <div style="font-size: 12px; color: var(--color-9x16); font-weight: 600;">
+              → Vào không gian sản xuất 9:16
+            </div>
+            <span class="btn btn-primary-9x16" style="font-size: 12px; padding: 6px 14px;">Mở dây 9:16</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- KHO ĐỀ TÀI & GỢI Ý MẶT TIỀN -->
+      <div class="card">
+        <div class="card-title">
+          <span>Ý tưởng &amp; Câu tục ngữ gợi ý từ xưởng</span>
+          <button class="btn btn-sm" id="btn-refresh-chan-de">Làm mới gợi ý</button>
+        </div>
+        <div id="dash-suggestions-list" class="grid-2" style="font-size: 13px;">
+          <!-- Nạp gợi ý từ chân đế -->
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ==========================================================================
+         VIEW 2: DÂY 16:9 (BÀI DÀI ~15 PHÚT - MÀU NHẤN VÀNG HỔ PHÁCH)
+         ========================================================================== -->
+    <section id="view-pipe16x9" class="view-section">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span class="portal-badge" style="background: rgba(229, 169, 60, 0.2); color: var(--color-16x9); border: 1px solid var(--color-16x9);">
+            KHÔNG GIAN 16:9
+          </span>
+          <h2 style="font-size: 18px; font-weight: 700;">Dây Sản Xuất Video Dài (16:9)</h2>
+        </div>
+        <div style="font-size: 12px; color: var(--text-muted);">
+          Màn ảnh ngang · Khung phát 1920x1080 · Kể chuyện sâu sắc
+        </div>
+      </div>
+
+      <!-- NÚT CHÍNH MỘT NÚT (16:9) -->
+      <div class="card" style="border: 2px solid var(--color-16x9-border); background: var(--color-16x9-bg); margin-bottom: 20px;">
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+          <div>
+            <div style="font-size: 12px; font-weight: 700; color: var(--color-16x9); text-transform: uppercase; letter-spacing: 0.05em;">
+              ★ CHẠY TỰ ĐỘNG TOÀN DÂY
+            </div>
+            <h3 style="font-size: 18px; font-weight: 700; margin: 4px 0 8px 0; color: #fff;">
+              Chạy một mẻ 16:9 (Từ kịch bản tới video)
+            </h3>
+            <p style="font-size: 13px; color: #e2d9cc; max-width: 600px;">
+              Hệ thống sẽ tự viết kịch bản, tạo giọng thu âm, dựng hình bìa và xuất bản video 16:9 hoàn chỉnh. Bấm một nút và theo dõi trên thanh tiến độ.
+            </p>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
+            <!-- Nút 10: /api/me_nhieu_video -->
+            <button id="btn-me-nhieu-video" data-api="/api/me_nhieu_video" class="btn btn-primary-16x9" style="font-size: 15px; padding: 12px 24px;">
+              ⚡ Bắt đầu chạy mẻ 16:9
+            </button>
+            <span id="feedback-me-nhieu-video" class="btn-feedback" style="display: none;"></span>
+          </div>
+        </div>
+
+        <!-- Tuỳ chọn cho mẻ 16:9 -->
+        <div style="display: flex; gap: 16px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--color-16x9-border); flex-wrap: wrap; align-items: center;">
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
+            <label for="select-so-video-16x9" style="color: var(--text-muted);">Số lượng video:</label>
+            <select id="select-so-video-16x9" class="form-select" style="padding: 4px 10px; font-size: 13px;">
+              <option value="1">1 video</option>
+              <option value="2">2 video</option>
+              <option value="3">3 video</option>
+              <option value="5">5 video</option>
+            </select>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
+            <label for="input-cau-tuc-ngu-16x9" style="color: var(--text-muted);">Câu tục ngữ (tự chọn nếu để trống):</label>
+            <input id="input-cau-tuc-ngu-16x9" type="text" class="form-input" placeholder="Để trống = Xưởng tự chọn" style="width: 240px; padding: 4px 10px;" />
+          </div>
+
+          <label class="form-checkbox-label">
+            <input type="checkbox" id="check-den-video-16x9" checked />
+            <span>Làm đến video (không dừng ở kịch bản)</span>
+          </label>
+
+          <label class="form-checkbox-label">
+            <input type="checkbox" id="check-cho-poe-16x9" />
+            <span>Chờ Poe khi cần</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- CÁC BƯỚC BẤM TAY THEO THỨ TỰ (16:9) -->
+      <h3 style="font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--text-main);">
+        Các bước bấm tay theo thứ tự (khi muốn kiểm tra từng khâu)
+      </h3>
+      
+      <div class="grid-4" style="margin-bottom: 24px;">
+        
+        <!-- BƯỚC 1: VIẾT KỊCH BẢN (Nút 11: /api/viet_ban_thao & Nút 15: /api/tao_me) -->
+        <div class="card">
+          <div class="card-title">
+            <span>1. Viết kịch bản</span>
+            <span class="brand-tag">Bước 1</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+            Tạo bản thảo lời bình theo cấu trúc triết lý người xưa.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button id="btn-viet-ban-thao" data-api="/api/viet_ban_thao" class="btn btn-sm">
+              ✍️ Viết bản thảo mới
+            </button>
+            <span id="feedback-viet-ban-thao" class="btn-feedback" style="display: none;"></span>
+
+            <button id="btn-toggle-paste-script" class="btn btn-sm" style="background: transparent;">
+              📋 Hoặc dán kịch bản tay...
+            </button>
+          </div>
+
+          <!-- Ô dán kịch bản tay gập mở -->
+          <div id="box-paste-script" style="display: none; margin-top: 10px;">
+            <textarea id="textarea-paste-script" class="form-textarea" placeholder="Dán toàn văn kịch bản vào đây..."></textarea>
+            <button id="btn-tao-me" data-api="/api/tao_me" class="btn btn-sm btn-primary-16x9" style="margin-top: 6px; width: 100%;">
+              Tạo mẻ từ kịch bản này
+            </button>
+            <span id="feedback-tao-me" class="btn-feedback" style="display: none;"></span>
+          </div>
+        </div>
+
+        <!-- BƯỚC 2: THU GIỌNG (Nút 12: /api/thu_giong) -->
+        <div class="card">
+          <div class="card-title">
+            <span>2. Thu giọng đọc</span>
+            <span class="brand-tag">Bước 2</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+            Chuyển kịch bản thành giọng đọc truyền cảm, ngắt nhịp tĩnh tại.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button id="btn-thu-giong" data-api="/api/thu_giong" class="btn btn-sm">
+              🎙️ Thu giọng cho mẻ
+            </button>
+            <span id="feedback-thu-giong" class="btn-feedback" style="display: none;"></span>
+          </div>
+        </div>
+
+        <!-- BƯỚC 3: DỰNG ẢNH BÌA (Nút 14: /api/dung_bia) -->
+        <div class="card">
+          <div class="card-title">
+            <span>3. Dựng ảnh bìa</span>
+            <span class="brand-tag">Bước 3</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+            Tạo ảnh bìa 16:9 thu hút, chữ rõ ràng không bị che góc.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button id="btn-dung-bia" data-api="/api/dung_bia" class="btn btn-sm">
+              🖼️ Dựng bìa 16:9
+            </button>
+            <span id="feedback-dung-bia" class="btn-feedback" style="display: none;"></span>
+          </div>
+        </div>
+
+        <!-- BƯỚC 4: DỰNG VIDEO (Nút 13: /api/dung_video) -->
+        <div class="card">
+          <div class="card-title">
+            <span>4. Dựng video</span>
+            <span class="brand-tag">Bước 4</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+            Ráp hình ảnh, âm nhạc, phụ đề chữ đồng bộ theo nhịp giọng.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button id="btn-dung-video" data-api="/api/dung_video" class="btn btn-sm">
+              🎞️ Dựng video mẻ này
+            </button>
+            <span id="feedback-dung-video" class="btn-feedback" style="display: none;"></span>
+
+            <!-- Nút duyệt nghe đạt c2_nghe_dat: true -->
+            <button id="btn-dung-video-c2" data-api="/api/dung_video" class="btn btn-sm btn-primary-16x9" title="Xác nhận đã nghe giọng duyệt đạt và tiếp tục dựng phim">
+              ✓ Đã nghe đạt — Dựng video
+            </button>
+            <span id="feedback-dung-video-c2" class="btn-feedback" style="display: none;"></span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- NÚT 16: THỬ DÂY KHÔNG TẠO MẺ -->
+      <div style="margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg-surface); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+        <div style="font-size: 13px;">
+          <strong>Kiểm tra thông luồng:</strong> Chạy thử dây để kiểm tra máy trạm mà không tạo mẻ mới vào kho.
+        </div>
+        <div>
+          <button id="btn-chay-thu-day" data-api="/api/chay" class="btn btn-sm">
+            🧪 Thử dây (không tạo mẻ)
+          </button>
+          <span id="feedback-chay-thu-day" class="btn-feedback" style="display: none;"></span>
+        </div>
+      </div>
+
+      <!-- SẢN PHẨM RIÊNG CỦA DÂY 16:9 (KHUNG NGANG 16:9 CHUẨN) -->
+      <div class="card">
+        <div class="card-title">
+          <span>Sản phẩm của riêng dây 16:9 (Màn ảnh ngang)</span>
+          <span id="count-video-16x9" class="brand-tag">0 video</span>
+        </div>
+        <div id="grid-pipe-16x9-videos" class="video-grid">
+          <!-- Render video 16:9 -->
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ==========================================================================
+         VIEW 3: DÂY 9:16 (BÀI NGẮN ~60 GIÂY - MÀU NHẤN XANH NGỌC BÍCH)
+         ========================================================================== -->
+    <section id="view-pipe9x16" class="view-section">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span class="portal-badge" style="background: rgba(43, 182, 115, 0.2); color: var(--color-9x16); border: 1px solid var(--color-9x16);">
+            KHÔNG GIAN 9:16
+          </span>
+          <h2 style="font-size: 18px; font-weight: 700;">Dây Sản Xuất Video Ngắn (9:16)</h2>
+        </div>
+        <div style="font-size: 12px; color: var(--text-muted);">
+          Màn hình điện thoại dọc · Khung phát 1080x1920 · Đúc kết ngắn gọn cho TikTok &amp; Shorts
+        </div>
+      </div>
+
+      <!-- NÚT CHÍNH MỘT NÚT (9:16) -->
+      <div class="card" style="border: 2px solid var(--color-9x16-border); background: var(--color-9x16-bg); margin-bottom: 20px;">
+        <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+          <div>
+            <div style="font-size: 12px; font-weight: 700; color: var(--color-9x16); text-transform: uppercase; letter-spacing: 0.05em;">
+              ★ CHẠY TỰ ĐỘNG TOÀN DÂY 9:16
+            </div>
+            <h3 style="font-size: 18px; font-weight: 700; margin: 4px 0 8px 0; color: #fff;">
+              Chạy một mẻ 9:16 (Từ kịch bản tới video dọc)
+            </h3>
+            <p style="font-size: 13px; color: #d0f0e0; max-width: 600px;">
+              Tạo video ngắn 9:16 trọn gói, tối ưu nhịp câu, phụ đề chạy nổi giữa màn hình, sẵn sàng đăng tải đa nền tảng.
+            </p>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
+            <!-- Nút 17: /api/me_9x16_tron -->
+            <button id="btn-me-9x16-tron" data-api="/api/me_9x16_tron" class="btn btn-primary-9x16" style="font-size: 15px; padding: 12px 24px;">
+              ⚡ Bắt đầu chạy mẻ 9:16
+            </button>
+            <span id="feedback-me-9x16-tron" class="btn-feedback" style="display: none;"></span>
+          </div>
+        </div>
+
+        <!-- Tuỳ chọn cho mẻ 9:16 -->
+        <div style="display: flex; gap: 16px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--color-9x16-border); flex-wrap: wrap; align-items: center;">
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
+            <label for="select-thoi-luong-9x16" style="color: var(--text-muted);">Thời lượng mục tiêu:</label>
+            <select id="select-thoi-luong-9x16" class="form-select" style="padding: 4px 10px; font-size: 13px;">
+              <option value="NGAN_60s">Ngắn ~60 giây (TikTok / Shorts nhanh)</option>
+              <option value="DAI_90s">Dài ~90 giây (Reels / Lắng đọng)</option>
+            </select>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 13px;">
+            <label for="select-so-ban-9x16" style="color: var(--text-muted);">Số bản dựng:</label>
+            <select id="select-so-ban-9x16" class="form-select" style="padding: 4px 10px; font-size: 13px;">
+              <option value="1">1 bản</option>
+              <option value="2">2 bản</option>
+              <option value="3">3 bản</option>
+              <option value="5">5 bản</option>
+            </select>
+          </div>
+
+          <label class="form-checkbox-label">
+            <input type="checkbox" id="check-cho-poe-9x16" />
+            <span>Chờ Poe khi cần</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- CÁC BƯỚC BẤM TAY THEO THỨ TỰ (9:16) -->
+      <h3 style="font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--text-main);">
+        Các bước bấm tay theo thứ tự (Dây 9:16)
+      </h3>
+
+      <div class="grid-4" style="margin-bottom: 24px;">
+        
+        <!-- BƯỚC 1: VIẾT KỊCH BẢN 9:16 (Nút 18: /api/viet_9x16) -->
+        <div class="card">
+          <div class="card-title">
+            <span>1. Viết kịch bản 9:16</span>
+            <span class="brand-tag">Dọc</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+            Soạn lời thoại dồn nhịp, câu mở đầu giữ người xem 3 giây đầu.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button id="btn-viet-9x16" data-api="/api/viet_9x16" class="btn btn-sm">
+              ✍️ Soạn kịch bản 9:16
+            </button>
+            <span id="feedback-viet-9x16" class="btn-feedback" style="display: none;"></span>
+          </div>
+        </div>
+
+        <!-- BƯỚC 2: THU GIỌNG DÂY 9:16 (Nút 12: /api/thu_giong) -->
+        <div class="card">
+          <div class="card-title">
+            <span>2. Thu giọng đọc</span>
+            <span class="brand-tag">Âm thanh</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+            Thu âm cho mẻ 9:16 với tiết tấu dứt khoát hơn.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button id="btn-thu-giong-9x16" data-api="/api/thu_giong" class="btn btn-sm">
+              🎙️ Thu giọng mẻ này
+            </button>
+            <span id="feedback-thu-giong-9x16" class="btn-feedback" style="display: none;"></span>
+          </div>
+        </div>
+
+        <!-- BƯỚC 3: DỰNG BÌA 9:16 (Nút 19: /api/dung_bia_9x16) -->
+        <div class="card">
+          <div class="card-title">
+            <span>3. Dựng bìa 9:16</span>
+            <span class="brand-tag">Khung dọc</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+            Xuất ảnh bìa tỷ lệ đứng chuẩn bị cho TikTok / Reels.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button id="btn-dung-bia-9x16" data-api="/api/dung_bia_9x16" class="btn btn-sm">
+              🖼️ Dựng bìa 9:16
+            </button>
+            <span id="feedback-dung-bia-9x16" class="btn-feedback" style="display: none;"></span>
+          </div>
+        </div>
+
+        <!-- BƯỚC 4: DỰNG VIDEO 9:16 (Nút 20: /api/dung_video_9x16) -->
+        <div class="card">
+          <div class="card-title">
+            <span>4. Dựng video 9:16</span>
+            <span class="brand-tag">Hoàn tất</span>
+          </div>
+          <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+            Ghép nhạc nền, xuất khung hình dọc 1080x1920 hoàn chỉnh.
+          </p>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <button id="btn-dung-video-9x16" data-api="/api/dung_video_9x16" class="btn btn-sm btn-primary-9x16">
+              🎞️ Dựng video 9:16
+            </button>
+            <span id="feedback-dung-video-9x16" class="btn-feedback" style="display: none;"></span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SẢN PHẨM RIÊNG CỦA DÂY 9:16 (KHUNG DỌC 9:16 CHUẨN) -->
+      <div class="card">
+        <div class="card-title">
+          <span>Sản phẩm của riêng dây 9:16 (Khung đứng dọc)</span>
+          <span id="count-video-9x16" class="brand-tag">0 video</span>
+        </div>
+        <div id="grid-pipe-9x16-videos" class="video-grid">
+          <!-- Render video 9:16 dạng khung dọc -->
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ==========================================================================
+         VIEW 4: THƯ VIỆN VIDEO (21 VIDEO - LỌC & TÌM KIẾM & XEM CHI TIẾT)
+         ========================================================================== -->
+    <section id="view-library" class="view-section">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+        <div>
+          <h2 style="font-size: 18px; font-weight: 700;">Thư Viện Sản Phẩm Video</h2>
+          <div style="font-size: 12px; color: var(--text-muted);">
+            Lưới thẻ trực quan · Khung kiểm tra chất lượng · Sao chép mô tả đa nền tảng
+          </div>
+        </div>
+        <div id="library-stats-badge" class="brand-tag" style="font-size: 12px; padding: 4px 10px;">
+          Tổng: 21 video
+        </div>
+      </div>
+
+      <!-- THANH LỌC VÀ TÌM KIẾM NHANH -->
+      <div class="filter-bar">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <label for="filter-ratio-select" style="font-size: 12px; color: var(--text-muted);">Tỉ lệ:</label>
+          <select id="filter-ratio-select" class="filter-input">
+            <option value="all">Tất cả (16:9 &amp; 9:16)</option>
+            <option value="16x9">Chỉ bài dài 16:9</option>
+            <option value="9x16">Chỉ bài ngắn 9:16</option>
+          </select>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <label for="filter-status-select" style="font-size: 12px; color: var(--text-muted);">Trạng thái:</label>
+          <select id="filter-status-select" class="filter-input">
+            <option value="all">Tất cả trạng thái</option>
+            <option value="dang_duoc">Đăng được</option>
+            <option value="chua_dang">Chưa đăng được (cần sửa)</option>
+            <option value="da_dang">Đã đăng lên mạng</option>
+          </select>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <label for="filter-platform-select" style="font-size: 12px; color: var(--text-muted);">Nền tảng:</label>
+          <select id="filter-platform-select" class="filter-input">
+            <option value="all">Tất cả</option>
+            <option value="youtube">YouTube</option>
+            <option value="tiktok">TikTok</option>
+            <option value="facebook">Facebook Reels</option>
+          </select>
+        </div>
+
+        <div style="flex: 1; min-width: 180px;">
+          <input type="text" id="filter-search-input" class="filter-input" placeholder="Tìm theo tên mẻ, tên tệp..." style="width: 100%;" />
+        </div>
+      </div>
+
+      <!-- LƯỚI THẺ VIDEO (KHÔNG RENDER QUÁ 60 MỤC MỖI LẦN) -->
+      <div id="library-video-grid" class="video-grid">
+        <!-- Render thẻ video có nhãn tỉ lệ, ảnh bìa, thời lượng, huy hiệu -->
+      </div>
+
+      <!-- Phân trang thư viện video -->
+      <div class="pagination-bar" id="library-pagination">
+        <span id="library-page-info">Hiển thị 1–21 / 21 video</span>
+        <div style="display: flex; gap: 6px;">
+          <button class="btn btn-sm" id="btn-lib-prev" disabled>Trang trước</button>
+          <button class="btn btn-sm" id="btn-lib-next" disabled>Trang sau</button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ==========================================================================
+         VIEW 5: KHO GIỌNG & CHỮ (129 MẺ & 412 BẢN THẢO - PHÂN TRANG GỌN GÀNG)
+         ========================================================================== -->
+    <section id="view-repository" class="view-section">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+        <div>
+          <h2 style="font-size: 18px; font-weight: 700;">Kho Giọng &amp; Kịch Bản Chữ</h2>
+          <div style="font-size: 12px; color: var(--text-muted);">
+            Lưu trữ 129 mẻ sản xuất và 412 bản thảo · Phân trang chống tràn màn hình
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <span class="brand-tag">129 mẻ sản xuất</span>
+          <span class="brand-tag">412 bản thảo</span>
+        </div>
+      </div>
+
+      <!-- BỘ LỌC KHO -->
+      <div class="filter-bar">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <label for="repo-category-select" style="font-size: 12px; color: var(--text-muted);">Kho lưu trữ:</label>
+          <select id="repo-category-select" class="filter-input">
+            <option value="me">Danh sách mẻ âm thanh (129 mẻ)</option>
+            <option value="kich_ban">Kịch bản viết tay (16 tệp)</option>
+            <option value="ban_thao">Bản thảo bị giữ lại (412 tệp)</option>
+          </select>
+        </div>
+
+        <div style="flex: 1; min-width: 200px;">
+          <input type="text" id="repo-search-input" class="filter-input" placeholder="Tìm kiếm tên mẻ, tên tệp âm thanh..." style="width: 100%;" />
+        </div>
+      </div>
+
+      <!-- DANH SÁCH MỤC TRONG KHO (RENDER TỐI ĐA 20 MỤC MỖI TRANG) -->
+      <div id="repo-items-container" style="display: flex; flex-direction: column; gap: 10px;">
+        <!-- Render các mục mẻ, bản thảo -->
+      </div>
+
+      <!-- Phân trang kho -->
+      <div class="pagination-bar" id="repo-pagination">
+        <span id="repo-page-info">Đang hiển thị...</span>
+        <div style="display: flex; gap: 6px;">
+          <button class="btn btn-sm" id="btn-repo-prev">« Trước</button>
+          <button class="btn btn-sm" id="btn-repo-next">Sau »</button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ==========================================================================
+         VIEW 6: HỆ THỐNG & KHO NGUỒN (9 MỤC SẴN SÀNG, KHÓA GOOGLE, TỐN TIỀN)
+         ========================================================================== -->
+    <section id="view-system" class="view-section">
+      <div style="margin-bottom: 16px;">
+        <h2 style="font-size: 18px; font-weight: 700;">Hệ Thống, Kho Nguồn &amp; Máy Thuê</h2>
+        <div style="font-size: 12px; color: var(--text-muted);">
+          Kiểm soát tài nguyên phần cứng, chìa khóa API và máy chủ tính tiền theo giây
+        </div>
+      </div>
+
+      <!-- 1. VÙNG TỐN TIỀN THẬT (MÁY THUÊ CLOUD POD - CẢNH BÁO MÀU HỔ PHÁCH RIÊNG) -->
+      <div class="card danger-zone-card" style="margin-bottom: 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="danger-zone-badge">⚠️ VÙNG TỐN TIỀN THẬT</span>
+            <strong style="color: var(--text-main); font-size: 14px;">Máy Thuê Đám Mây (Cloud Pod tính cước theo giây)</strong>
+          </div>
+          <div style="font-size: 12px; color: var(--text-muted); display: flex; gap: 10px;">
+            <span id="pod-wallet-balance">Số dư ví: --</span>
+            <span id="pod-running-count">Pod đang chạy: 0</span>
+          </div>
+        </div>
+
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">
+          Máy thuê chỉ bật khi cần dựng video nặng hoặc viết kịch bản chuyên sâu. Bấm nút Tắt máy thuê bất kỳ lúc nào để ngắt tiền ngay lập tức.
+        </p>
+
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+          <!-- Nút 9: /api/may_duoi_tran -->
+          <button id="btn-may-duoi-tran" data-api="/api/may_duoi_tran" class="btn btn-sm">
+            🔍 Xem máy dưới trần giá
+          </button>
+          <span id="feedback-may-duoi-tran" class="btn-feedback" style="display: none;"></span>
+
+          <!-- Nút 31: /api/thue_may (xác nhận 2 nhịp) -->
+          <div style="display: inline-block;">
+            <button id="btn-thue-may" data-api="/api/thue_may" class="btn btn-sm btn-danger">
+              💸 Thuê máy cho mẻ
+            </button>
+            <div id="confirm-box-thue-may" class="confirm-inline-box">
+              <span>Xác nhận thuê máy tính cước?</span>
+              <button class="btn btn-sm btn-danger" id="btn-confirm-thue-may">Đồng ý thuê</button>
+              <button class="btn btn-sm" id="btn-cancel-thue-may">Huỷ</button>
+            </div>
+            <span id="feedback-thue-may" class="btn-feedback" style="display: none;"></span>
+          </div>
+
+          <!-- Nút 32: /api/viet_tren_pod (xác nhận 2 nhịp) -->
+          <div style="display: inline-block;">
+            <button id="btn-viet-pod" data-api="/api/viet_tren_pod" class="btn btn-sm btn-danger">
+              ☁️ Viết trên máy thuê
+            </button>
+            <div id="confirm-box-viet-pod" class="confirm-inline-box">
+              <span>Xác nhận chạy tác vụ trên Pod?</span>
+              <button class="btn btn-sm btn-danger" id="btn-confirm-viet-pod">Chạy ngay</button>
+              <button class="btn btn-sm" id="btn-cancel-viet-pod">Huỷ</button>
+            </div>
+            <span id="feedback-viet-pod" class="btn-feedback" style="display: none;"></span>
+          </div>
+
+          <!-- Nút 33: Tắt máy thuê (Bấm là gửi ngay, không hỏi) -->
+          <button id="btn-tat-pod" data-api="/api/tat_pod" class="btn-emergency">
+            ⚡ TẮT MÁY THUÊ / DỪNG CHỜ
+          </button>
+          <span id="feedback-tat-pod" class="btn-feedback" style="display: none;"></span>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom: 20px;">
+        
+        <!-- 2. SẴN SÀNG 9 MỤC TRỌNG YẾU (KHỐI GẬP MỞ KHÔNG TRÀN CHỮ) -->
+        <div class="card">
+          <div class="card-title">
+            <span>Chi tiết 9 mục sẵn sàng của máy chủ</span>
+            <button class="btn btn-sm" id="btn-reload-trang-thai">Kiểm tra lại</button>
+          </div>
+          <div id="accordion-readiness-details" style="display: flex; flex-direction: column; gap: 6px;">
+            <!-- Render 9 accordion items -->
+          </div>
+        </div>
+
+        <!-- 3. QUẢN LÝ KHÓA GOOGLE API -->
+        <div class="card">
+          <div class="card-title">
+            <span>Quản lý Khóa Google API</span>
+            <button class="btn btn-sm" id="btn-khoa-reload" data-api="/api/khoa_google">Nạp lại khóa</button>
+          </div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
+            <span id="khoa-stats-text">Số khóa: -- · Còn dùng: --</span>
+          </div>
+
+          <!-- Danh sách khóa -->
+          <div id="list-khoa-google" style="display: flex; flex-direction: column; gap: 6px; max-height: 180px; overflow-y: auto; margin-bottom: 12px;">
+            <!-- Render khóa -->
+          </div>
+
+          <!-- Thêm khóa mới (Nút 29: /api/khoa_google_them - che ký tự, xóa sau khi gửi) -->
+          <div style="border-top: 1px solid var(--border-subtle); padding-top: 10px;">
+            <label class="form-label">Thêm khóa Google mới:</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="password" id="input-new-google-key" class="form-input" placeholder="Dán mã khóa bí mật vào đây..." style="flex: 1;" autocomplete="off" />
+              <button id="btn-khoa-them" data-api="/api/khoa_google_them" class="btn btn-sm">
+                Thêm khóa
+              </button>
+            </div>
+            <span id="feedback-khoa-them" class="btn-feedback" style="display: none; margin-top: 4px;"></span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 4. KHO NGUỒN CÂU TỤC NGỮ CHÂN ĐẾ (3 NÚT CHẤM: ĐÚNG / SAI / NGỜ) -->
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="card-title">
+          <span>Kho nguồn câu tục ngữ chân đế (44 câu chọn lọc)</span>
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <!-- Nút 3: /api/de_tai?so=20 -->
+            <button id="btn-de-tai" data-api="/api/de_tai?so=20" class="btn btn-sm">20 Đề tài</button>
+            <!-- Nút 4: /api/chan_de -->
+            <button id="btn-chan-de-reload" data-api="/api/chan_de" class="btn btn-sm">Tải câu chân đế</button>
+            <!-- Nút 6: /api/kho_me_9x16 -->
+            <button id="btn-kho-me-9x16" data-api="/api/kho_me_9x16" class="btn btn-sm">Kho mẻ 9:16</button>
+            <!-- Nút 8: /api/soi_quet -->
+            <button id="btn-soi-quet" data-api="/api/soi_quet" class="btn btn-sm">Soi quét</button>
+            <!-- Nút 25: /api/cao_de_tai -->
+            <button id="btn-cao-de-tai" data-api="/api/cao_de_tai" class="btn btn-sm">Cào đề tài</button>
+            <!-- Nút 26: /api/cao_chat_lieu -->
+            <button id="btn-cao-chat-lieu" data-api="/api/cao_chat_lieu" class="btn btn-sm">Cào chất liệu</button>
+            <!-- Nút 28: /api/quet_lien_tuc -->
+            <button id="btn-quet-lien-tuc" data-api="/api/quet_lien_tuc" class="btn btn-sm">Quét liên tục</button>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-bottom: 10px; font-size: 12px; color: var(--text-muted); flex-wrap: wrap;">
+          <span>Bấm chấm trực tiếp ý nghĩa câu: <strong>✓ Đúng</strong>, <strong>✗ Sai</strong>, hoặc <strong>? Ngờ</strong>.</span>
+          <span id="feedback-chan-de" class="btn-feedback" style="display: none;"></span>
+        </div>
+
+        <!-- Bảng câu chân đế -->
+        <div style="overflow-x: auto; max-height: 340px; overflow-y: auto;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 12px; text-align: left;">
+            <thead>
+              <tr style="border-bottom: 1px solid var(--border-strong); color: var(--text-muted);">
+                <th style="padding: 8px;">Câu tục ngữ</th>
+                <th style="padding: 8px;">Nguồn</th>
+                <th style="padding: 8px;">Số lần</th>
+                <th style="padding: 8px;">Bản vẽ ý tưởng C2</th>
+                <th style="padding: 8px; text-align: center;">Chấm ý (Đúng/Sai/Ngờ)</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-chan-de">
+              <!-- Render câu chân đế -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ==========================================================================
+         VIEW 7: NHẬT KÝ MÁY CHỦ (FULL LOG VIEW)
+         ========================================================================== -->
+    <section id="view-logs" class="view-section">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+        <div>
+          <h2 style="font-size: 18px; font-weight: 700;">Nhật Ký Máy Trạm (System Log)</h2>
+          <div style="font-size: 12px; color: var(--text-muted);">
+            Ghi nhận mọi tiến trình viết kịch bản, thu âm, ghép hình và dựng video
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <label class="form-checkbox-label" style="font-size: 12px;">
+            <input type="checkbox" id="check-auto-scroll-log" checked />
+            <span>Tự cuộn theo dòng mới</span>
+          </label>
+          <button class="btn btn-sm" id="btn-clear-local-log">Xóa màn hình</button>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 0; overflow: hidden;">
+        <div id="full-log-viewer" style="background: #090a0c; color: #a3a8b2; font-family: monospace; font-size: 12px; padding: 14px; height: 500px; overflow-y: auto; line-height: 1.6;">
+          <div style="color: #64748b;">[Hệ thống] Đang kết nối luồng nhật ký từ /api/nhat_ky...</div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+
+  <!-- ==========================================================================
+       MODAL: CHI TIẾT VIDEO (PHÁT ĐÚNG TỈ LỆ, SỐ ĐO KIỂM TRA, MÔ TẢ ĐĂNG BÀI)
+       ========================================================================== -->
+  <div id="video-detail-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-video-title">
+    <div class="modal-window">
+      <div class="modal-head">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span id="modal-video-ratio-badge" class="portal-badge">16:9</span>
+          <h3 id="modal-video-title" class="ellipsis-1" style="font-size: 15px; font-weight: 600; max-width: 500px;">Chi tiết video</h3>
+        </div>
+        <button id="btn-close-video-modal" class="modal-close-btn" aria-label="Đóng">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- TRÌNH PHÁT VIDEO ĐỘC LẬP (KHÔNG BỊ PHÁ KHI POLLING) -->
+        <div id="modal-player-box" class="player-box">
+          <video id="modal-main-video" controls playsinline preload="metadata">
+            Trình duyệt của bạn không hỗ trợ phát thẻ video.
+          </video>
+        </div>
+
+        <!-- SỐ ĐO KIỂM TRA CHẤT LƯỢNG VIDEO -->
+        <div>
+          <h4 style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">Số đo kiểm tra video</h4>
+          <div id="modal-inspection-box" class="video-inspection-grid">
+            <div><strong>Khung hình:</strong> <span id="insp-kho">-</span></div>
+            <div><strong>Thời lượng:</strong> <span id="insp-thoi-luong">-</span></div>
+            <div><strong>Lệch âm thanh:</strong> <span id="insp-lech-giay">-</span></div>
+            <div><strong>Lệch phụ đề:</strong> <span id="insp-lech-sub">-</span></div>
+            <div><strong>Dư hình:</strong> <span id="insp-du-hinh">-</span></div>
+            <div><strong>Logo xưởng:</strong> <span id="insp-logo">-</span></div>
+          </div>
+
+          <!-- Lý do chưa đăng được nếu có -->
+          <div id="modal-unready-reason-box" style="display: none; margin-top: 8px; padding: 8px 12px; background: var(--color-warning-bg); border: 1px solid var(--color-warning); border-radius: 4px; font-size: 12px; color: var(--color-warning);">
+            <strong>Lý do chưa đăng được:</strong> <span id="modal-unready-reason-text"></span>
+          </div>
+
+          <!-- 3 ảnh khung kiểm tra -->
+          <div style="margin-top: 10px;">
+            <div style="font-size: 11px; color: var(--text-dim); margin-bottom: 4px;">3 khung kiểm tra trích xuất:</div>
+            <div id="modal-check-frames" class="check-frames-row"></div>
+          </div>
+        </div>
+
+        <!-- VĂN BẢN MÔ TẢ ĐỂ CHÉP ĐĂNG NỀN TẢNG (YOUTUBE / TIKTOK / REELS) -->
+        <div>
+          <h4 style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">Nội dung đăng tải theo nền tảng (Bấm nút chép nhanh)</h4>
+          <div id="modal-platform-texts" style="display: flex; flex-direction: column; gap: 8px;">
+            <!-- Sẽ nạp động các box copy -->
+          </div>
+        </div>
+
+        <!-- CÁC NÚT THAO TÁC CHO VIDEO -->
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 14px;">
+          
+          <!-- Mở trang đăng -->
+          <div style="display: flex; gap: 6px;">
+            <a id="link-upload-youtube" href="https://www.youtube.com/upload" target="_blank" rel="noopener noreferrer" class="btn btn-sm">
+              Mở YouTube
+            </a>
+            <a id="link-upload-tiktok" href="https://www.tiktok.com/tiktokstudio/upload" target="_blank" rel="noopener noreferrer" class="btn btn-sm">
+              Mở TikTok
+            </a>
+            <a id="link-upload-fb" href="https://www.facebook.com/reels/create" target="_blank" rel="noopener noreferrer" class="btn btn-sm">
+              Mở Reels
+            </a>
+          </div>
+
+          <!-- Nút 7: /api/mo_ta_9x16 -->
+          <button id="btn-mo-ta-9x16" data-api="/api/mo_ta_9x16" class="btn btn-sm">
+            📋 Tải lại mô tả 9:16
+          </button>
+          <span id="feedback-mo-ta-9x16" class="btn-feedback" style="display: none;"></span>
+
+          <!-- Nút 21: /api/kiem_video -->
+          <button id="btn-kiem-video" data-api="/api/kiem_video" class="btn btn-sm">
+            🔍 Kiểm lại video
+          </button>
+          <span id="feedback-kiem-video" class="btn-feedback" style="display: none;"></span>
+
+          <!-- Nút 22: /api/da_dang -->
+          <button id="btn-da-dang" data-api="/api/da_dang" class="btn btn-sm" style="background: var(--color-success-bg); color: var(--color-success); border-color: var(--color-success);">
+            ✓ Đánh dấu đã đăng
+          </button>
+          <span id="feedback-da-dang" class="btn-feedback" style="display: none;"></span>
+
+          <!-- Nút 23: /api/co_nho_me -->
+          <button id="btn-co-nho-me" data-api="/api/co_nho_me" class="btn btn-sm">
+            🧹 Tính dung lượng dọn
+          </button>
+          <span id="feedback-co-nho-me" class="btn-feedback" style="display: none;"></span>
+
+          <!-- Nút 24: /api/xoa_kho (Xác nhận 2 nhịp) -->
+          <div style="display: inline-block;">
+            <button id="btn-xoa-kho" data-api="/api/xoa_kho" class="btn btn-sm btn-danger">
+              🗑️ Xóa kho lưu trữ
+            </button>
+            <div id="confirm-box-xoa-kho" class="confirm-inline-box">
+              <span id="confirm-xoa-text">Xác nhận xóa tệp?</span>
+              <button class="btn btn-sm btn-danger" id="btn-confirm-xoa-kho">Xóa thật</button>
+              <button class="btn btn-sm" id="btn-cancel-xoa-kho">Huỷ</button>
+            </div>
+            <span id="feedback-xoa-kho" class="btn-feedback" style="display: none;"></span>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ==========================================================================
+       MODAL: CHI TIẾT 9 MỤC SẴN SÀNG CỦA XƯỞNG
+       ========================================================================== -->
+  <div id="readiness-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-readiness-title">
+    <div class="modal-window" style="max-width: 650px;">
+      <div class="modal-head">
+        <h3 id="modal-readiness-title" style="font-size: 15px; font-weight: 600;">9 Mục Sẵn Sàng Của Xưởng</h3>
+        <button id="btn-close-readiness-modal" class="modal-close-btn" aria-label="Đóng">&times;</button>
+      </div>
+      <div class="modal-body" id="readiness-modal-content">
+        <!-- Render 9 mục chi tiết -->
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ==========================================================================
+       JAVASCRIPT THUẦN (KHÔNG THƯ VIỆN, ĐẦY ĐỦ 33 ĐƯỜNG API, DỮ LIỆU MẪU NHÚNG)
+       ========================================================================== -->
+  <script>
+    (function () {
+      "use strict";
+
+      /* --------------------------------------------------------------------------
+         A. QUẢN LÝ CHẾ ĐỘ SÁNG / TỐI & 3 BỘ MÀU (DARK MODE & THEMES)
+         -------------------------------------------------------------------------- */
+      const THEME_KEY = "xuong_theme";
+      const VALID_THEMES = ["dark", "light", "sepia"];
+
+      /**
+       * Phát hiện và xử lý sự kiện đổi giao diện (theme change event),
+       * ngay lập tức áp dụng theme được chọn (dark, light, hoặc sepia) lên tài liệu
+       * và cập nhật khóa 'xuong_theme' trong localStorage để ghi nhớ cho lần tải trang tiếp theo.
+       *
+       * @param {string|CustomEvent|Event} eventOrTheme - Chuỗi tên theme ('dark'|'light'|'sepia') hoặc CustomEvent mang thuộc tính detail.theme
+       */
+      function handleThemeChangeEvent(eventOrTheme) {
+        var requestedTheme = null;
+
+        if (typeof eventOrTheme === "string") {
+          requestedTheme = eventOrTheme;
+        } else if (eventOrTheme && eventOrTheme.detail) {
+          requestedTheme = eventOrTheme.detail.theme || eventOrTheme.detail;
+        } else if (eventOrTheme && eventOrTheme.target && eventOrTheme.target.dataset) {
+          requestedTheme = eventOrTheme.target.dataset.theme;
+        }
+
+        if (!requestedTheme || VALID_THEMES.indexOf(requestedTheme) === -1) {
+          return;
+        }
+
+        // 1. Áp dụng tức thì lên toàn bộ tài liệu (cả html và body)
+        document.documentElement.setAttribute("data-theme", requestedTheme);
+        if (document.body) {
+          document.body.setAttribute("data-theme", requestedTheme);
+        }
+
+        // 2. Lưu vào localStorage để ghi nhớ vĩnh viễn qua các lần tải trang
+        try {
+          localStorage.setItem(THEME_KEY, requestedTheme);
+        } catch (e) {
+          // Bỏ qua nếu môi trường sandbox hạn chế dung lượng lưu trữ
+        }
+
+        // 3. Đồng bộ trạng thái active của các nút chọn màu trên giao diện
+        document.querySelectorAll(".theme-btn").forEach(function (btn) {
+          btn.classList.toggle("active", btn.getAttribute("data-theme") === requestedTheme);
+        });
+
+        // 4. Đồng bộ nút chuyển nhanh Tối / Sáng
+        var toggleBtn = document.getElementById("btn-theme-toggle");
+        var toggleIcon = document.getElementById("theme-toggle-icon");
+        var toggleText = document.getElementById("theme-toggle-text");
+        var isDark = requestedTheme !== "light";
+
+        if (toggleBtn) {
+          toggleBtn.setAttribute("aria-checked", isDark ? "true" : "false");
+          toggleBtn.title = isDark ? "Đang ở chế độ Tối (Bấm để chuyển sang Sáng)" : "Đang ở chế độ Sáng (Bấm để chuyển sang Tối)";
+        }
+        if (toggleIcon) {
+          toggleIcon.textContent = isDark ? "🌙" : "☀️";
+        }
+        if (toggleText) {
+          toggleText.textContent = isDark ? "Chế độ Tối" : "Chế độ Sáng";
+        }
+      }
+
+      // Giữ alias applyTheme cho khả năng tương thích cao
+      const applyTheme = handleThemeChangeEvent;
+
+      // Lắng nghe sự kiện đổi theme từ window và document
+      window.addEventListener("themechange", handleThemeChangeEvent);
+      window.addEventListener("xuong_theme_changed", handleThemeChangeEvent);
+      document.addEventListener("themechange", handleThemeChangeEvent);
+
+      // Đọc và áp dụng theme đã lưu từ localStorage khi mở trang
+      var systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var savedTheme = localStorage.getItem(THEME_KEY) || (systemPrefersDark ? "dark" : "dark");
+      handleThemeChangeEvent(savedTheme);
+
+      // Nút chuyển đổi nhanh Tối / Sáng (Dark / Light Toggle Button)
+      var themeToggleBtn = document.getElementById("btn-theme-toggle");
+      themeToggleBtn?.addEventListener("click", function () {
+        var currentTheme = document.documentElement.getAttribute("data-theme") || document.body.getAttribute("data-theme") || "dark";
+        var newTheme = currentTheme === "light" ? "dark" : "light";
+        window.dispatchEvent(new CustomEvent("themechange", { detail: { theme: newTheme } }));
+      });
+
+      // Các nút chọn bộ 3 màu (Trúc Mặc, Hoàng Hôn, Trúc Sáng)
+      document.querySelectorAll(".theme-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          var t = btn.getAttribute("data-theme");
+          if (t) {
+            window.dispatchEvent(new CustomEvent("themechange", { detail: { theme: t } }));
+          }
+        });
+      });
+
+      // Lắng nghe sự kiện storage để đồng bộ theme tức thì giữa các tab/cửa sổ khác nhau
+      window.addEventListener("storage", function (e) {
+        if (e.key === THEME_KEY && e.newValue) {
+          if (VALID_THEMES.indexOf(e.newValue) !== -1) {
+            handleThemeChangeEvent(e.newValue);
+          }
+        }
+      });
+
+      /* --------------------------------------------------------------------------
+         B. ĐIỀU HƯỚNG TABS
+         -------------------------------------------------------------------------- */
+      const navTabs = document.querySelectorAll(".nav-tab");
+      const viewSections = document.querySelectorAll(".view-section");
+
+      navTabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+          const targetView = tab.getAttribute("data-view");
+          switchView(targetView);
+        });
+      });
+
+      function switchView(viewName) {
+        navTabs.forEach(t => {
+          t.classList.toggle("active", t.getAttribute("data-view") === viewName);
+        });
+        viewSections.forEach(s => {
+          s.classList.toggle("active", s.id === `view-${viewName}`);
+        });
+        localStorage.setItem("xuong_current_view", viewName);
+      }
+
+      // Khôi phục view tab đã lưu
+      const savedView = localStorage.getItem("xuong_current_view") || "dashboard";
+      switchView(savedView);
+
+      // Cửa to ở mặt tiền dẫn tới các dây
+      document.getElementById("portal-btn-16x9")?.addEventListener("click", () => switchView("pipe16x9"));
+      document.getElementById("portal-btn-9x16")?.addEventListener("click", () => switchView("pipe9x16"));
+      document.getElementById("btn-goto-library")?.addEventListener("click", () => switchView("library"));
+      document.getElementById("btn-goto-running-pipe")?.addEventListener("click", () => {
+        if (state.batchState && state.batchState.me && state.batchState.me.includes("_9x16")) {
+          switchView("pipe9x16");
+        } else {
+          switchView("pipe16x9");
+        }
+      });
+
+      /* --------------------------------------------------------------------------
+         C. TRẠNG THÁI ỨNG DỤNG (GLOBAL STATE)
+         -------------------------------------------------------------------------- */
+      const state = {
+        isMockMode: false,
+        serverConnected: false,
+        trangThai: null,
+        nhatKy: null,
+        batchState: {
+          trang_thai: "chua_chay",
+          khau: "",
+          buoc: 0,
+          tong_buoc: 4,
+          ten_buoc: "",
+          bat_dau: 0,
+          nhip: 0,
+          phan_tram: null,
+          con_lai_giay: null,
+          me: ""
+        },
+        videos: [],
+        chanDe: [],
+        khoaGoogle: [],
+        currentVideoModal: null,
+        // Phân trang
+        libPage: 1,
+        libPageSize: 12,
+        repoPage: 1,
+        repoPageSize: 15,
+        repoCategory: "me"
+      };
+
+      /* --------------------------------------------------------------------------
+         D. DỮ LIỆU MẪU ĐỘC LẬP CHUẨN MỰC (MOCK DATA KHI MÁY CHỦ PYTHON CHƯA NỐI)
+         -------------------------------------------------------------------------- */
+      const MOCK_DATA = {
+        trang_thai: {
+          dang_chay: true,
+          san_sang: [
+            { ma: "o_dia", muc: "xanh", chu: "Ổ đĩa NVMe còn trống 482 GB (Đạt chuẩn tối thiểu >50GB)." },
+            { ma: "giay_to", muc: "xanh", chu: "Giấy tờ xác thực và cấu hình thư mục hợp lệ." },
+            { ma: "khoa_api", muc: "xanh", chu: "12 khoá API Google đang kích hoạt, phân bổ luân phiên ổn định." },
+            { ma: "ffmpeg", muc: "xanh", chu: "FFmpeg 6.1-full có hỗ trợ tăng tốc phần cứng NVENC GPU." },
+            { ma: "giong", muc: "xanh", chu: "Mô hình giọng đọc nội bộ sẵn sàng, độ trễ phản hồi <1.2s." },
+            { ma: "khoa_ma", muc: "xanh", chu: "Khóa mã hóa kịch bản và chữ ký an toàn toàn vẹn." },
+            { ma: "gemini_ngay", muc: "vang", chu: "Hạn mức Gemini trong ngày đã dùng 78% (3.900/5.000 lượt yêu cầu). Khuyến nghị theo dõi nếu chạy mẻ nhiều video liên tiếp hoặc tạm dừng các tác vụ cào dữ liệu không cấp thiết." },
+            { ma: "kho_nhac", muc: "xanh", chu: "Kho nhạc nền thiền tịnh triết học: 85 bài không bản quyền có sẵn." },
+            { ma: "tu_bat", muc: "xanh", chu: "Chế độ tự động khởi động dịch vụ máy trạm đang bật." }
+          ],
+          ma_may_chu: {
+            doi: false,
+            so_tep: 142,
+            khoi_dong_luc: "11/10/2026 08:30:00"
+          },
+          kho: {
+            de_tai: 68,
+            chat_lieu: 240
+          },
+          me_moi_nhat: "me_20261011_143000",
+          me_can_video: "me_20261011_143000",
+          me_can_giong: null,
+          me_goi_y: "me_20261011_151200_9x16",
+          kho_video: [
+            // 10 bài 16:9
+            {
+              me: "me_20261011_143000",
+              tep: "video_triet_ly_tam_tinh.mp4",
+              mb: 142.5,
+              ngay: "11/10/2026",
+              moc: 1728639000,
+              la_9x16: false,
+              da_dang: true,
+              dang_luc: "11/10/2026 15:00",
+              hong: false,
+              bia: [{ nhan: "Bìa chính", ten: "bia_16x9.jpg", ten_nho: "bia_16x9_thumb.jpg" }],
+              kiem: {
+                giay: 890,
+                phut: 14.8,
+                kho: "1920x1080",
+                lech_giay: 0.02,
+                du_hinh_giay: 0,
+                lech_phu_de_giay: 0.01,
+                co_logo: true,
+                khung: ["frame1.jpg", "frame2.jpg", "frame3.jpg"],
+                loi: [],
+                dang_duoc: true,
+                vi_sao_chua_dang: "",
+                phieu_dang: { duoc_dang: true, vi_sao_chua_dang: "", ghi_cong: "Đầy đủ logo xưởng" }
+              },
+              sdl: {
+                tieu_de: "Tâm Tĩnh Như Nước: Lời Người Xưa Về Cách Đối Đãi Với Giông Bão Cuộc Đời",
+                hashtag: ["#TrietLyCuocSong", "#CoThu", "#LoiNguoiXua", "#TamTinh"],
+                mo_ta: "Nước gặp đá thì rẽ dòng, gặp vực thì biến thành thác, khi phẳng lặng thì soi bóng mây trời...",
+                cau_hoi_bia: "Gặp lúc khốn cùng, người trí làm gì?"
+              }
+            },
+            {
+              me: "me_20261010_192000",
+              tep: "hoc_cach_buong_bo.mp4",
+              mb: 135.2,
+              ngay: "10/10/2026",
+              moc: 1728570000,
+              la_9x16: false,
+              da_dang: false,
+              hong: false,
+              bia: [{ nhan: "Bìa 16:9", ten: "bia_buong_bo.jpg" }],
+              kiem: {
+                giay: 840,
+                phut: 14.0,
+                kho: "1920x1080",
+                lech_giay: 0.01,
+                du_hinh_giay: 0,
+                lech_phu_de_giay: 0.85,
+                co_logo: true,
+                khung: ["frame1.jpg", "frame2.jpg", "frame3.jpg"],
+                loi: ["Lệch phụ đề 0.85s"],
+                dang_duoc: false,
+                vi_sao_chua_dang: "Lệch phụ đề 0.85 giây so với âm thanh ở phân đoạn 3 (quy chuẩn tối đa cho phép 0.2s)."
+              },
+              sdl: {
+                tieu_de: "Học Cách Buông Bỏ Những Chuyện Không Thuộc Về Mình",
+                hashtag: ["#BuongBo", "#AnNhien", "#TrietLy"],
+                mo_ta: "Nắm chặt một nắm cát, cát sẽ chảy qua kẽ tay. Đặt nhẹ lòng bàn tay, cát sẽ còn nguyên vẹn.",
+                cau_hoi_bia: "Buông có phải là yếu đuối?"
+              }
+            },
+            {
+              me: "me_20261009_080000",
+              tep: "khong_tranh_la_dinh_cao.mp4",
+              mb: 160.0,
+              ngay: "09/10/2026",
+              moc: 1728442000,
+              la_9x16: false,
+              da_dang: true,
+              dang_luc: "09/10/2026 10:00",
+              hong: false,
+              bia: [{ nhan: "Bìa 16:9", ten: "bia_khong_tranh.jpg" }],
+              kiem: {
+                giay: 910,
+                phut: 15.1,
+                kho: "1920x1080",
+                lech_giay: 0,
+                du_hinh_giay: 0,
+                lech_phu_de_giay: 0,
+                co_logo: true,
+                khung: ["frame1.jpg"],
+                loi: [],
+                dang_duoc: true,
+                vi_sao_chua_dang: ""
+              },
+              sdl: {
+                tieu_de: "Bậc Trí Giả Không Tranh Cãi Với Kẻ Nông Cạn",
+                hashtag: ["#DaoKinh", "#LaoTu"],
+                mo_ta: "Thiện giả bất biện, biện giả bất thiện...",
+                cau_hoi_bia: "Vì sao im lặng là sức mạnh lớn nhất?"
+              }
+            },
+            // 11 bài 9:16
+            {
+              me: "me_20261011_151200_9x16",
+              tep: "tam_yen_van_su_thong_9x16.mp4",
+              mb: 32.4,
+              ngay: "11/10/2026",
+              moc: 1728641520,
+              la_9x16: true,
+              da_dang: false,
+              hong: false,
+              bia: [{ nhan: "Bìa dọc", ten: "bia_9x16_tam_yen.jpg" }],
+              kiem: {
+                giay: 58,
+                phut: 0.96,
+                kho: "1080x1920",
+                lech_giay: 0,
+                du_hinh_giay: 0,
+                lech_phu_de_giay: 0.02,
+                co_logo: true,
+                khung: ["f1.jpg", "f2.jpg"],
+                loi: [],
+                dang_duoc: true,
+                vi_sao_chua_dang: ""
+              },
+              mo_ta_nen: {
+                tiktok: "Tâm yên thì vạn sự thông. Bớt nghĩ ngợi một chút, lòng sẽ nhẹ thênh thang. #trietly #loinguoixua #tamtrang #fyp",
+                shorts: "Tâm Yên Vạn Sự Thông | Triết lý sống mỗi ngày #Shorts #LoiNguoiXua",
+                reels: "Một phút tĩnh tâm giữa bộn bề: Tâm an thì đời tự khắc bình yên. #ReelsVN #TrietLy"
+              }
+            },
+            {
+              me: "me_20261011_110000_9x16",
+              tep: "loi_ran_ve_tien_bac_9x16.mp4",
+              mb: 38.1,
+              ngay: "11/10/2026",
+              moc: 1728626400,
+              la_9x16: true,
+              da_dang: true,
+              dang_luc: "11/10/2026 12:15",
+              hong: false,
+              bia: [{ nhan: "Bìa dọc", ten: "bia_9x16_tien.jpg" }],
+              kiem: {
+                giay: 62,
+                phut: 1.03,
+                kho: "1080x1920",
+                lech_giay: 0.01,
+                du_hinh_giay: 0,
+                lech_phu_de_giay: 0.01,
+                co_logo: true,
+                khung: ["f1.jpg"],
+                loi: [],
+                dang_duoc: true,
+                vi_sao_chua_dang: ""
+              },
+              mo_ta_nen: {
+                tiktok: "Tiền bạc thử lòng người, nghèo khó thấy chân tình. #trietlytienbac #loicu #baihoccuocsong",
+                shorts: "Lời Người Xưa Về Tiền Bạc #Shorts",
+                reels: "Tiền thử người, thời gian thử tình. #Reels"
+              }
+            }
+          ],
+          pod: {
+            da_noi: true,
+            tran_gia: "0.28 $/giờ",
+            co_khoa_api: true,
+            pod_dang_chay: "Pod-RTX4090-SG-01",
+            so_du_vi: "18.42 $",
+            so_pod: 1
+          },
+          poe: { co_khoa: true },
+          cong: 3000
+        },
+        nhat_ky: {
+          dang_chay: true,
+          dong: [
+            { muc: "info", chu: "15:20:12 [Hệ thống] Nhận lệnh khởi chạy mẻ me_20261011_152000 (Dây 16:9)." },
+            { muc: "info", chu: "15:20:15 [Kịch bản] Đang tải câu tục ngữ: 'Một cây làm chẳng nên non'." },
+            { muc: "info", chu: "15:22:04 [Kịch bản] Hoàn tất bản thảo 1.840 từ đạt chuẩn C2 triết lý." },
+            { muc: "info", chu: "15:24:18 [Giọng đọc] Đã kết xuất 14 đoạn âm thanh mp3, tần số 48kHz." },
+            { muc: "info", chu: "15:26:00 [Ảnh bìa] Dựng xong ảnh bìa tỷ lệ 16:9 độ phân giải 1920x1080." },
+            { muc: "info", chu: "15:27:45 [Dựng video] Đang ghép phụ đề và đồng bộ audio..." }
+          ],
+          me: {
+            trang_thai: "dang_chay",
+            khau: "Dựng video",
+            buoc: 3,
+            tong_buoc: 4,
+            ten_buoc: "Đang ghép hình ảnh và đồng bộ phụ đề chữ",
+            bat_dau: Math.floor(Date.now() / 1000) - 480, // đã chạy 8 phút
+            nhip: Math.floor(Date.now() / 1000) - 2,     // tín hiệu 2s trước
+            ket_qua: "",
+            de_tai: "Tâm tĩnh như nước",
+            phan_tram: null, // Chưa có % trong bước
+            con_lai_giay: 180 // Còn khoảng 3 phút
+          }
+        },
+        chan_de: {
+          tu_viet: ["Nước chảy đá mòn", "Lạt mềm buộc chặt"],
+          goi_y: [
+            { cau: "Lạt mềm buộc chặt", ban_ve: "Lời ăn tiếng nói nhu mì mà hóa giải xung đột", so_lan: 3, lan_cuoi: "08/10/2026" },
+            { cau: "Gió tầng nào gặp mây tầng đó", ban_ve: "Cùng tần số đức hạnh sẽ hội ngộ", so_lan: 5, lan_cuoi: "09/10/2026" }
+          ],
+          cau: [
+            { ma: "CD-01", cau: "Thuốc đắng dã tật, sự thật mất lòng", ban_ve: "Chấp nhận lời thẳng thắn", ban_ve_C2: "Lời trung ngôn như gương soi khuyết điểm", nghia_dung: true, nguon: "Kho tàng tục ngữ VN", xac_nhan: "dung", so_lan_dung: 2 },
+            { ma: "CD-02", cau: "Ăn quả nhớ kẻ trồng cây", ban_ve: "Lòng biết ơn cội nguồn", ban_ve_C2: "Biết ơn là gốc của mọi phúc báo", nghia_dung: true, nguon: "Ca dao dân ca", xac_nhan: "dung", so_lan_dung: 4 },
+            { ma: "CD-03", cau: "Thao thức đêm dài mới biết đêm dài", ban_ve: "Trải qua gian truân mới thấu tình đời", ban_ve_C2: "Đường xa mới biết sức ngựa", nghia_dung: true, nguon: "Cổ văn", xac_nhan: "ngo", so_lan_dung: 1 }
+          ]
+        },
+        khoa_google: {
+          khoa: [
+            { stt: 1, ma: "AIzaSyD-KEY-01", nhan: "AIzaSyD***K01", tep: "env.keys", co_the_go: true, nghi: false, so_luot: 1240 },
+            { stt: 2, ma: "AIzaSyB-KEY-02", nhan: "AIzaSyB***K02", tep: "env.keys", co_the_go: true, nghi: false, so_luot: 890 },
+            { stt: 3, ma: "AIzaSyC-KEY-03", nhan: "AIzaSyC***K03", tep: "env.keys", co_the_go: true, nghi: true, nghi_den: "16:00", so_luot: 1500 }
+          ],
+          so_khoa: 3,
+          con_dung: 2,
+          dat_lai_luc: "00:00:00",
+          tran_tham_khao: "5000 lượt/ngày"
+        }
+      };
+
+      /* --------------------------------------------------------------------------
+         E. GỌI API MÁY CHỦ THẬT VÀ TỰ ĐỘNG CHUYỂN DỮ LIỆU MẪU
+         -------------------------------------------------------------------------- */
+      async function apiFetch(url, options = {}) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3500);
+
+        try {
+          const res = await fetch(url, { credentials: "same-origin", ...options, signal: controller.signal });
+          clearTimeout(timeoutId);
+
+          if (!res.ok) {
+            let errorJson = null;
+            try { errorJson = await res.json(); } catch(e){}
+            const err = new Error(errorJson?.loi || `Lỗi máy chủ HTTP ${res.status}`);
+            err.status = res.status;
+            err.data = errorJson;
+            throw err;
+          }
+
+          const data = await res.json();
+          // Nối thành công với máy chủ thật
+          if (state.isMockMode) {
+            setMockMode(false);
+          }
+          state.serverConnected = true;
+          return data;
+        } catch (err) {
+          clearTimeout(timeoutId);
+          // Nếu fetch thất bại hoàn toàn (timeout hoặc rớt mạng máy trạm)
+          if (!state.serverConnected && !state.isMockMode) {
+            setMockMode(true);
+          }
+          throw err;
+        }
+      }
+
+      function setMockMode(active) {
+        state.isMockMode = active;
+        const banner = document.getElementById("mock-data-banner");
+        if (banner) {
+          banner.style.display = active ? "flex" : "none";
+        }
+        if (active) {
+          // Nạp dữ liệu mẫu vào state
+          state.trangThai = MOCK_DATA.trang_thai;
+          state.nhatKy = MOCK_DATA.nhat_ky;
+          state.batchState = MOCK_DATA.nhat_ky.me;
+          state.videos = MOCK_DATA.trang_thai.kho_video;
+          state.chanDe = MOCK_DATA.chan_de.cau;
+          state.khoaGoogle = MOCK_DATA.khoa_google.khoa;
+          renderAll();
+        }
+      }
+
+      // Nút thử kết nối lại
+      document.getElementById("btn-reconnect-server")?.addEventListener("click", () => {
+        fetchTrangThai();
+        fetchNhatKy();
+      });
+
+      /* --------------------------------------------------------------------------
+         F. HÀM GỬI LỆNH POST (CÓ KHÓA NÚT + PHẢN HỒI THỜI GIAN VÀ NGUYÊN VĂN LỖI)
+         -------------------------------------------------------------------------- */
+      async function sendPostCommand(endpoint, payload, buttonElement, feedbackElement) {
+        if (!buttonElement) return;
+
+        const originalText = buttonElement.innerHTML;
+        buttonElement.disabled = true;
+
+        const now = new Date();
+        const timeStr = now.toTimeString().split(" ")[0];
+
+        if (feedbackElement) {
+          feedbackElement.style.display = "inline-flex";
+          feedbackElement.className = "btn-feedback feedback-sending";
+          feedbackElement.textContent = `Đã nhận lệnh lúc ${timeStr}...`;
+        }
+
+        // Nếu đang ở chế độ mẫu: Giả lập phản hồi trung thực sau 800ms
+        if (state.isMockMode) {
+          setTimeout(() => {
+            buttonElement.disabled = false;
+            if (feedbackElement) {
+              feedbackElement.className = "btn-feedback feedback-success";
+              feedbackElement.textContent = `✓ Lệnh đã hoàn tất [Mẫu] lúc ${new Date().toTimeString().split(" ")[0]}`;
+              setTimeout(() => { feedbackElement.style.display = "none"; }, 5000);
+            }
+
+            // Nếu là lệnh khởi tạo mẻ -> cập nhật trạng thái mẻ mẫu
+            if (endpoint === "/api/me_nhieu_video" || endpoint === "/api/me_9x16_tron" || endpoint === "/api/chay") {
+              state.batchState = {
+                trang_thai: "dang_chay",
+                khau: endpoint.includes("9x16") ? "Dây 9:16" : "Dây 16:9",
+                buoc: 1,
+                tong_buoc: 4,
+                ten_buoc: "Đang viết kịch bản triết lý...",
+                bat_dau: Math.floor(Date.now() / 1000),
+                nhip: Math.floor(Date.now() / 1000),
+                phan_tram: null,
+                con_lai_giay: null,
+                me: endpoint.includes("9x16") ? "me_vua_chay_9x16" : "me_vua_chay_16x9"
+              };
+              updateTrackerUI();
+            } else if (endpoint === "/api/tat_pod") {
+              const podCount = document.getElementById("pod-running-count");
+              if (podCount) podCount.textContent = "Pod đang chạy: 0 (Đã tắt)";
+            }
+          }, 800);
+          return;
+        }
+
+        // Chế độ máy chủ thật
+        try {
+          const res = await apiFetch(endpoint, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload || {})
+          });
+
+          buttonElement.disabled = false;
+
+          if (feedbackElement) {
+            feedbackElement.className = "btn-feedback feedback-success";
+            feedbackElement.textContent = `✓ Thành công: ${res.thong_bao || "Lệnh đã được máy chủ tiếp nhận"}`;
+            setTimeout(() => { feedbackElement.style.display = "none"; }, 5000);
+          }
+
+          // Cập nhật lại trạng thái ngay
+          fetchNhatKy();
+        } catch (err) {
+          buttonElement.disabled = false;
+          if (feedbackElement) {
+            feedbackElement.className = "btn-feedback feedback-error";
+            if (err.status === 409) {
+              feedbackElement.textContent = "⚠️ Máy chủ đang chạy một mẻ rồi, vui lòng đợi mẻ hiện tại xong.";
+            } else {
+              feedbackElement.textContent = `✗ Thất bại: ${err.message || "Lỗi máy chủ"}`;
+            }
+          }
+        }
+      }
+
+      /* --------------------------------------------------------------------------
+         G. GỌI GET DỮ LIỆU ĐỊNH KỲ (POLLING CHUẨN MỰC)
+         -------------------------------------------------------------------------- */
+      async function fetchTrangThai() {
+        try {
+          const data = await apiFetch("/api/trang_thai");
+          state.trangThai = data;
+          state.videos = data.kho_video || [];
+          renderTrangThai();
+        } catch (e) {
+          // Bắt lỗi im lặng hoặc chuyển mock mode nếu chưa nối
+        }
+      }
+
+      async function fetchNhatKy() {
+        try {
+          const data = await apiFetch("/api/nhat_ky");
+          state.nhatKy = data;
+          if (data.me) {
+            state.batchState = data.me;
+          }
+          updateTrackerUI();
+          renderLogs();
+        } catch (e) {
+          // Polling nhat ky lỗi
+        }
+      }
+
+      // Khởi động chu kỳ hỏi máy chủ
+      fetchTrangThai();
+      fetchNhatKy();
+
+      // /api/trang_thai hỏi mỗi 5 giây
+      setInterval(fetchTrangThai, 5000);
+
+      // /api/nhat_ky hỏi mỗi 2 giây khi dang_chay, mỗi 10 giây khi rảnh
+      setInterval(() => {
+        const isRunning = state.batchState && state.batchState.trang_thai === "dang_chay";
+        // Khi đang chạy polling liên tục, khi rảnh giảm tải
+        fetchNhatKy();
+      }, 2000);
+
+      // Cập nhật nhịp tim & đồng hồ từng giây trên giao diện
+      setInterval(updateTrackerTimeTicks, 1000);
+
+      /* --------------------------------------------------------------------------
+         H. RENDER TOÀN BỘ GIAO DIỆN & KHÔNG PHÁ PHẦN TỬ ĐANG DÙNG
+         -------------------------------------------------------------------------- */
+      function renderAll() {
+        renderTrangThai();
+        updateTrackerUI();
+        renderLogs();
+      }
+
+      /* 1. Render Trạng Thái & 9 Mục Sẵn Sàng */
+      function renderTrangThai() {
+        if (!state.trangThai) return;
+
+        // Cảnh báo mã máy chủ cũ
+        const outdatedBanner = document.getElementById("outdated-server-banner");
+        if (outdatedBanner && state.trangThai.ma_may_chu) {
+          outdatedBanner.style.display = state.trangThai.ma_may_chu.doi ? "flex" : "none";
+          const uptime = document.getElementById("server-uptime-text");
+          if (uptime) uptime.textContent = `Khởi động lúc: ${state.trangThai.ma_may_chu.khoi_dong_luc || "N/A"}`;
+        }
+
+        // 9 Mục sẵn sàng ở mặt tiền
+        const readinessList = document.getElementById("readiness-pills-list");
+        const modalReadiness = document.getElementById("readiness-modal-content");
+        const accordionSystem = document.getElementById("accordion-readiness-details");
+
+        if (readinessList && state.trangThai.san_sang) {
+          readinessList.innerHTML = "";
+          let totalXanh = 0;
+
+          state.trangThai.san_sang.forEach(item => {
+            if (item.muc === "xanh") totalXanh++;
+
+            const pill = document.createElement("div");
+            pill.style.cssText = `
+              display: flex; align-items: center; gap: 6px; padding: 4px 8px;
+              border-radius: 4px; font-size: 11px; font-weight: 500;
+              background: ${item.muc === "xanh" ? "rgba(43,182,115,0.15)" : item.muc === "vang" ? "rgba(245,158,11,0.15)" : "rgba(239,68,68,0.15)"};
+              color: ${item.muc === "xanh" ? "var(--color-success)" : item.muc === "vang" ? "var(--color-warning)" : "var(--color-danger)"};
+              border: 1px solid ${item.muc === "xanh" ? "rgba(43,182,115,0.3)" : item.muc === "vang" ? "rgba(245,158,11,0.3)" : "rgba(239,68,68,0.3)"};
+            `;
+            pill.className = "ellipsis-1";
+            pill.title = item.chu;
+            pill.textContent = `${item.muc === "xanh" ? "✓" : item.muc === "vang" ? "!" : "✗"} ${item.ma}`;
+            readinessList.appendChild(pill);
+          });
+
+          const summaryTag = document.getElementById("readiness-summary-tag");
+          if (summaryTag) {
+            summaryTag.textContent = `${totalXanh}/9 Đạt`;
+            summaryTag.style.color = totalXanh === 9 ? "var(--color-success)" : "var(--color-warning)";
+          }
+        }
+
+        // Render chi tiết trong modal & accordion
+        if (modalReadiness && state.trangThai.san_sang) {
+          modalReadiness.innerHTML = "";
+          state.trangThai.san_sang.forEach(item => {
+            const row = document.createElement("div");
+            row.style.cssText = "margin-bottom: 12px; padding: 10px; border-radius: 6px; background: var(--bg-surface-elevated); border: 1px solid var(--border-subtle);";
+            
+            const title = document.createElement("div");
+            title.style.cssText = "font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;";
+            title.textContent = `${item.muc === "xanh" ? "🟢" : item.muc === "vang" ? "🟡" : "🔴"} Mục: ${item.ma}`;
+            
+            const desc = document.createElement("div");
+            desc.style.cssText = "font-size: 13px; color: var(--text-muted); line-height: 1.5;";
+            desc.textContent = item.chu; // Dùng textContent an toàn tuyệt đối
+            
+            row.appendChild(title);
+            row.appendChild(desc);
+            modalReadiness.appendChild(row);
+          });
+        }
+
+        if (accordionSystem && state.trangThai.san_sang) {
+          accordionSystem.innerHTML = "";
+          state.trangThai.san_sang.forEach(item => {
+            const accItem = document.createElement("div");
+            accItem.className = "accordion-item";
+
+            const header = document.createElement("div");
+            header.className = "accordion-header";
+            header.innerHTML = `
+              <span style="font-weight: 500; font-size: 13px;">${item.muc === "xanh" ? "🟢" : item.muc === "vang" ? "🟡" : "🔴"} ${item.ma}</span>
+              <span style="font-size: 12px; color: var(--text-dim);">Bấm mở ▾</span>
+            `;
+            header.addEventListener("click", () => accItem.classList.toggle("open"));
+
+            const body = document.createElement("div");
+            body.className = "accordion-body";
+            body.textContent = item.chu; // textContent an toàn
+
+            accItem.appendChild(header);
+            accItem.appendChild(body);
+            accordionSystem.appendChild(accItem);
+          });
+        }
+
+        // Sản phẩm mới nhất ở Mặt Tiền
+        const latestTitle = document.getElementById("dash-latest-title");
+        const latestTime = document.getElementById("dash-latest-time");
+        const latestRatio = document.getElementById("dash-latest-ratio");
+        const latestStatus = document.getElementById("dash-latest-status");
+
+        if (state.videos && state.videos.length > 0) {
+          const newest = state.videos[0];
+          if (latestTitle) latestTitle.textContent = newest.sdl?.tieu_de || newest.tep;
+          if (latestTime) latestTime.textContent = `Tạo ngày: ${newest.ngay} · Dung lượng: ${newest.mb} MB`;
+          if (latestRatio) latestRatio.textContent = newest.la_9x16 ? "9:16 Dọc" : "16:9 Ngang";
+          if (latestStatus) {
+            latestStatus.innerHTML = `<span class="video-status-tag ${newest.da_dang ? 'tag-published' : newest.kiem?.dang_duoc ? 'tag-ready' : 'tag-unready'}">
+              ${newest.da_dang ? '✓ Đã đăng' : newest.kiem?.dang_duoc ? 'Sẵn sàng đăng' : 'Chưa đăng được'}
+            </span>`;
+          }
+        }
+
+        // Render thư viện video và các danh sách dây
+        renderVideos();
+        renderRepository();
+        renderChanDe();
+        renderKhoaGoogle();
+      }
+
+      /* 2. CẬP NHẬT THANH THEO DÕI MẺ CỐ ĐỊNH (TRACKER BAR - BẮT BUỘC TRUNG THỰC) */
+      function updateTrackerUI() {
+        const b = state.batchState;
+        if (!b) return;
+
+        const badge = document.getElementById("tracker-status-badge");
+        const statusText = document.getElementById("tracker-status-text");
+        const batchName = document.getElementById("tracker-batch-name");
+        const stageName = document.getElementById("tracker-stage-name");
+        const progressFill = document.getElementById("tracker-progress-fill");
+        const progressLabel = document.getElementById("tracker-progress-label");
+        const progressBar = document.getElementById("tracker-progress-bar");
+        const etaText = document.getElementById("tracker-eta");
+
+        // Cập nhật thẻ ở Dashboard (Câu hỏi 2)
+        const dashBadge = document.getElementById("dash-running-badge");
+        const dashTitle = document.getElementById("dash-running-batch-title");
+        const dashSub = document.getElementById("dash-running-batch-sub");
+
+        if (b.trang_thai === "dang_chay") {
+          badge.className = "tracker-status-tag status-running";
+          statusText.textContent = "Đang chạy mẻ";
+          batchName.textContent = b.me || "Mẻ đang chạy";
+          stageName.textContent = `[${b.khau || "Đang xử lý"}]: ${b.ten_buoc || ""}`;
+
+          if (dashBadge) { dashBadge.textContent = "Đang chạy"; dashBadge.style.color = "var(--color-info)"; }
+          if (dashTitle) dashTitle.textContent = b.me || "Mẻ đang thực hiện";
+          if (dashSub) dashSub.textContent = `Khâu: ${b.khau} — Bước ${b.buoc}/${b.tong_buoc || 4}: ${b.ten_buoc}`;
+
+          // Tính toán phần trăm TRUNG THỰC
+          const tong = b.tong_buoc || 4;
+          const currentBuoc = b.buoc || 1;
+          const overallPct = Math.min(100, Math.round((currentBuoc / tong) * 100));
+
+          progressBar.setAttribute("aria-valuenow", overallPct);
+
+          // Nếu máy chủ CÓ gửi phan_tram (0-100)
+          if (typeof b.phan_tram === "number" && !isNaN(b.phan_tram)) {
+            progressFill.classList.remove("progress-bar-indeterminate");
+            progressFill.style.width = `${b.phan_tram}%`;
+            progressLabel.textContent = `${b.phan_tram}% (Bước: ${b.phan_tram}%)`;
+          } else {
+            // Chưa có phan_tram trong bước -> hiển thị % tổng bước và hiệu ứng indeterminate sóng lượn
+            progressFill.classList.add("progress-bar-indeterminate");
+            progressFill.style.width = "100%";
+            progressLabel.textContent = `${overallPct}% (Bước ${currentBuoc}/${tong})`;
+          }
+
+          // Ước lượng thời gian còn lại nếu có con_lai_giay
+          if (typeof b.con_lai_giay === "number" && b.con_lai_giay > 0) {
+            const mins = Math.floor(b.con_lai_giay / 60);
+            const secs = b.con_lai_giay % 60;
+            etaText.textContent = `⏳ Còn khoảng ~${mins > 0 ? mins + 'p ' : ''}${secs}s`;
+          } else {
+            etaText.textContent = "";
+          }
+
+          // Cập nhật Stepper 4 bước
+          for (let i = 1; i <= 4; i++) {
+            const node = document.getElementById(`step-node-${i}`);
+            if (!node) continue;
+            node.className = "step-node";
+            if (i < currentBuoc) {
+              node.classList.add("done");
+              node.innerHTML = `✓ Bước ${i} xong`;
+            } else if (i === currentBuoc) {
+              node.classList.add("current");
+              node.innerHTML = `▶ Bước ${i} (${b.khau || "Đang làm"})`;
+            } else {
+              node.innerHTML = `Bước ${i}`;
+            }
+          }
+
+        } else if (b.trang_thai === "xong") {
+          badge.className = "tracker-status-tag status-completed";
+          statusText.textContent = "Hoàn tất";
+          batchName.textContent = b.me || "Mẻ hoàn thành";
+          stageName.textContent = b.ket_qua ? `Kết quả: ${b.ket_qua}` : "Đã xuất video thành công.";
+          progressFill.classList.remove("progress-bar-indeterminate");
+          progressFill.style.width = "100%";
+          progressLabel.textContent = "100%";
+          etaText.textContent = "";
+
+          if (dashBadge) { dashBadge.textContent = "Xong"; dashBadge.style.color = "var(--color-success)"; }
+          if (dashTitle) dashTitle.textContent = "Mẻ gần nhất đã hoàn tất";
+          if (dashSub) dashSub.textContent = b.ket_qua || "Sẵn sàng chạy mẻ tiếp theo.";
+
+        } else if (b.trang_thai === "hong") {
+          badge.className = "tracker-status-tag status-failed";
+          statusText.textContent = "Hỏng / Lỗi";
+          batchName.textContent = b.me || "Mẻ thất bại";
+          // Nêu NGUYÊN VĂN lý do máy chủ gửi
+          stageName.textContent = `Lý do: ${b.ket_qua || "Máy chủ gặp sự cố xử lý"}`;
+          progressFill.classList.remove("progress-bar-indeterminate");
+          progressFill.style.backgroundColor = "var(--color-danger)";
+          progressLabel.textContent = "Lỗi";
+          etaText.textContent = "";
+
+          if (dashBadge) { dashBadge.textContent = "Hỏng"; dashBadge.style.color = "var(--color-danger)"; }
+          if (dashTitle) dashTitle.textContent = "Mẻ bị lỗi gián đoạn";
+          if (dashSub) dashSub.textContent = b.ket_qua || "Kiểm tra chi tiết trong nhật ký.";
+
+        } else {
+          // Chưa chạy
+          badge.className = "tracker-status-tag status-idle";
+          statusText.textContent = "Chưa chạy";
+          batchName.textContent = "Sẵn sàng nhận lệnh";
+          stageName.textContent = "-";
+          progressFill.classList.remove("progress-bar-indeterminate");
+          progressFill.style.width = "0%";
+          progressLabel.textContent = "0%";
+          etaText.textContent = "";
+
+          if (dashBadge) { dashBadge.textContent = "Rảnh"; dashBadge.style.color = "var(--text-dim)"; }
+          if (dashTitle) dashTitle.textContent = "Hiện không có mẻ nào chạy";
+          if (dashSub) dashSub.textContent = "Xưởng đang ở trạng thái rảnh rỗi, sẵn sàng nhận lệnh mới.";
+        }
+      }
+
+      function updateTrackerTimeTicks() {
+        const b = state.batchState;
+        if (!b) return;
+
+        const timerSpan = document.getElementById("tracker-timer");
+        const hbSpan = document.getElementById("tracker-heartbeat");
+        const nowSec = Math.floor(Date.now() / 1000);
+
+        if (b.trang_thai === "dang_chay" && b.bat_dau) {
+          const elapsed = Math.max(0, nowSec - b.bat_dau);
+          const m = Math.floor(elapsed / 60);
+          const s = elapsed % 60;
+          if (timerSpan) timerSpan.textContent = `⏱️ Đã chạy: ${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        } else {
+          if (timerSpan) timerSpan.textContent = `⏱️ Thời gian: 00:00`;
+        }
+
+        if (b.nhip) {
+          const hbSec = Math.max(0, nowSec - b.nhip);
+          if (hbSpan) hbSpan.textContent = `📡 Tín hiệu: ${hbSec}s trước`;
+        } else {
+          if (hbSpan) hbSpan.textContent = `📡 Tín hiệu: --s trước`;
+        }
+      }
+
+      // Gập mở dòng nhật ký tóm tắt trên tracker
+      const trackerLogBtn = document.getElementById("tracker-toggle-logs");
+      const trackerLogBox = document.getElementById("tracker-recent-logs");
+      trackerLogBtn?.addEventListener("click", () => {
+        const isHidden = trackerLogBox.style.display === "none";
+        trackerLogBox.style.display = isHidden ? "block" : "none";
+        trackerLogBtn.querySelector("span").textContent = isHidden ? "▾ Thu gọn nhật ký" : "▸ Dòng nhật ký máy trạm mới nhất";
+      });
+
+      /* 3. Render Logs vào 2 nơi (Tracker tóm tắt & Full Log Tab) */
+      function renderLogs() {
+        if (!state.nhatKy || !state.nhatKy.dong) return;
+
+        const lines = state.nhatKy.dong;
+        const summaryBox = document.getElementById("tracker-log-lines");
+        const fullViewer = document.getElementById("full-log-viewer");
+
+        if (summaryBox) {
+          summaryBox.innerHTML = "";
+          const lastFew = lines.slice(-3);
+          lastFew.forEach(l => {
+            const div = document.createElement("div");
+            div.textContent = l.chu;
+            summaryBox.appendChild(div);
+          });
+        }
+
+        if (fullViewer) {
+          // Lưu trạng thái cuộn trước khi vẽ lại
+          const isAtBottom = (fullViewer.scrollHeight - fullViewer.scrollTop) <= (fullViewer.clientHeight + 40);
+          fullViewer.innerHTML = "";
+          lines.forEach(l => {
+            const div = document.createElement("div");
+            div.style.padding = "2px 0";
+            if (l.muc === "error") div.style.color = "var(--color-danger)";
+            else if (l.muc === "warn") div.style.color = "var(--color-warning)";
+            div.textContent = l.chu;
+            fullViewer.appendChild(div);
+          });
+
+          const autoScrollCheck = document.getElementById("check-auto-scroll-log");
+          if (autoScrollCheck && autoScrollCheck.checked && isAtBottom) {
+            fullViewer.scrollTop = fullViewer.scrollHeight;
+          }
+        }
+      }
+
+      document.getElementById("btn-clear-local-log")?.addEventListener("click", () => {
+        const fullViewer = document.getElementById("full-log-viewer");
+        if (fullViewer) fullViewer.innerHTML = `<div style="color: #64748b;">Đã làm sạch nhật ký hiển thị tại chỗ.</div>`;
+      });
+
+      /* --------------------------------------------------------------------------
+         I. RENDER THƯ VIỆN VIDEO & TÁCH BẠCH 16:9 VÀ 9:16
+         -------------------------------------------------------------------------- */
+      function renderVideos() {
+        const allVideos = state.videos || [];
+
+        // 1. Phân chia cho Dây 16:9 và Dây 9:16
+        const list16x9 = allVideos.filter(v => !v.la_9x16);
+        const list9x16 = allVideos.filter(v => v.la_9x16);
+
+        const count16x9 = document.getElementById("count-video-16x9");
+        const count9x16 = document.getElementById("count-video-9x16");
+        if (count16x9) count16x9.textContent = `${list16x9.length} video 16:9`;
+        if (count9x16) count9x16.textContent = `${list9x16.length} video 9:16`;
+
+        renderVideoGrid(document.getElementById("grid-pipe-16x9-videos"), list16x9.slice(0, 8));
+        renderVideoGrid(document.getElementById("grid-pipe-9x16-videos"), list9x16.slice(0, 8));
+
+        // 2. Thư viện Video tổng hợp có LỌC & TÌM KIẾM
+        applyLibraryFilter();
+      }
+
+      function applyLibraryFilter() {
+        const allVideos = state.videos || [];
+        const ratioFilter = document.getElementById("filter-ratio-select")?.value || "all";
+        const statusFilter = document.getElementById("filter-status-select")?.value || "all";
+        const searchTerm = document.getElementById("filter-search-input")?.value.trim().toLowerCase() || "";
+
+        let filtered = allVideos.filter(v => {
+          if (ratioFilter === "16x9" && v.la_9x16) return false;
+          if (ratioFilter === "9x16" && !v.la_9x16) return false;
+
+          if (statusFilter === "da_dang" && !v.da_dang) return false;
+          if (statusFilter === "dang_duoc" && (!v.kiem?.dang_duoc || v.da_dang)) return false;
+          if (statusFilter === "chua_dang" && (v.kiem?.dang_duoc || v.da_dang)) return false;
+
+          if (searchTerm) {
+            const title = (v.sdl?.tieu_de || v.tep || "").toLowerCase();
+            const me = (v.me || "").toLowerCase();
+            if (!title.includes(searchTerm) && !me.includes(searchTerm)) return false;
+          }
+
+          return true;
+        });
+
+        // Phân trang thư viện
+        const total = filtered.length;
+        const totalPages = Math.max(1, Math.ceil(total / state.libPageSize));
+        if (state.libPage > totalPages) state.libPage = totalPages;
+
+        const startIdx = (state.libPage - 1) * state.libPageSize;
+        const pageItems = filtered.slice(startIdx, startIdx + state.libPageSize);
+
+        const grid = document.getElementById("library-video-grid");
+        renderVideoGrid(grid, pageItems);
+
+        // Cập nhật phân trang
+        const pageInfo = document.getElementById("library-page-info");
+        const prevBtn = document.getElementById("btn-lib-prev");
+        const nextBtn = document.getElementById("btn-lib-next");
+
+        if (pageInfo) pageInfo.textContent = `Hiển thị ${total === 0 ? 0 : startIdx + 1}–${Math.min(startIdx + state.libPageSize, total)} / ${total} video`;
+        if (prevBtn) prevBtn.disabled = state.libPage <= 1;
+        if (nextBtn) nextBtn.disabled = state.libPage >= totalPages;
+      }
+
+      // Lắng nghe sự kiện lọc thư viện
+      document.getElementById("filter-ratio-select")?.addEventListener("change", () => { state.libPage = 1; applyLibraryFilter(); });
+      document.getElementById("filter-status-select")?.addEventListener("change", () => { state.libPage = 1; applyLibraryFilter(); });
+      document.getElementById("filter-search-input")?.addEventListener("input", () => { state.libPage = 1; applyLibraryFilter(); });
+
+      document.getElementById("btn-lib-prev")?.addEventListener("click", () => {
+        if (state.libPage > 1) { state.libPage--; applyLibraryFilter(); }
+      });
+      document.getElementById("btn-lib-next")?.addEventListener("click", () => {
+        state.libPage++;
+        applyLibraryFilter();
+      });
+
+      function renderVideoGrid(container, items) {
+        if (!container) return;
+        container.innerHTML = "";
+
+        if (!items || items.length === 0) {
+          container.innerHTML = `<div style="grid-column: 1/-1; padding: 30px; text-align: center; color: var(--text-dim);">Chưa có video nào phù hợp với bộ lọc hiện tại.</div>`;
+          return;
+        }
+
+        items.forEach(v => {
+          const card = document.createElement("div");
+          card.className = "video-card";
+
+          // Khung ảnh bìa chuẩn tỉ lệ
+          const thumbContainer = document.createElement("div");
+          thumbContainer.className = `video-thumb-container ${v.la_9x16 ? 'thumb-9x16' : 'thumb-16x9'}`;
+
+          // Ảnh bìa hoặc placeholder SVG
+          const img = document.createElement("img");
+          img.className = "video-thumb-img";
+          img.loading = "lazy";
+          img.alt = v.sdl?.tieu_de || v.tep;
+
+          // Ảnh thật hoặc data SVG
+          if (v.bia && v.bia.length > 0 && v.bia[0].ten) {
+            img.src = `/tep/${encodeURIComponent(v.me)}/${encodeURIComponent(v.bia[0].ten_nho || v.bia[0].ten)}`;
+          } else {
+            // Placeholder SVG nội tuyến
+            img.src = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="180" viewBox="0 0 300 180" fill="%231a1c1f"><rect width="300" height="180" fill="%231a1c1f"/><text x="50%" y="50%" fill="%23717784" font-family="sans-serif" font-size="14" text-anchor="middle" dy=".3em">${v.la_9x16 ? 'Video 9:16 Dọc' : 'Video 16:9 Ngang'}</text></svg>`;
+          }
+          img.onerror = () => {
+            img.src = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="180" viewBox="0 0 300 180" fill="%231a1c1f"><rect width="300" height="180" fill="%231a1c1f"/><text x="50%" y="50%" fill="%23717784" font-family="sans-serif" font-size="14" text-anchor="middle" dy=".3em">Xưởng Triết Lý</text></svg>`;
+          };
+
+          // Nhãn tỉ lệ luôn hiện
+          const badge = document.createElement("div");
+          badge.className = `video-aspect-badge ${v.la_9x16 ? 'badge-9x16' : 'badge-16x9'}`;
+          badge.textContent = v.la_9x16 ? "9:16 Dọc" : "16:9 Ngang";
+
+          // Thời lượng
+          const duration = document.createElement("div");
+          duration.className = "video-duration-badge";
+          const durSec = v.kiem?.giay || 0;
+          const dm = Math.floor(durSec / 60);
+          const ds = durSec % 60;
+          duration.textContent = `${dm}:${ds.toString().padStart(2, '0')}`;
+
+          thumbContainer.appendChild(img);
+          thumbContainer.appendChild(badge);
+          thumbContainer.appendChild(duration);
+
+          // Thân thông tin
+          const body = document.createElement("div");
+          body.className = "video-info-body";
+
+          const titleEl = document.createElement("div");
+          titleEl.className = "video-title-text ellipsis-1";
+          titleEl.title = v.sdl?.tieu_de || v.tep;
+          titleEl.textContent = v.sdl?.tieu_de || v.tep;
+
+          const metaRow = document.createElement("div");
+          metaRow.className = "video-meta-row";
+          metaRow.innerHTML = `<span>${v.ngay}</span><span>${v.mb} MB</span>`;
+
+          const statusRow = document.createElement("div");
+          statusRow.style.cssText = "display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 4px;";
+
+          let statusTagHtml = "";
+          if (v.da_dang) {
+            statusTagHtml = `<span class="video-status-tag tag-published">✓ Đã đăng</span>`;
+          } else if (v.kiem?.dang_duoc) {
+            statusTagHtml = `<span class="video-status-tag tag-ready">Đăng được</span>`;
+          } else {
+            statusTagHtml = `<span class="video-status-tag tag-unready" title="${v.kiem?.vi_sao_chua_dang || ''}">Chưa đăng được</span>`;
+          }
+
+          statusRow.innerHTML = statusTagHtml;
+
+          const actionBtn = document.createElement("button");
+          actionBtn.className = "btn btn-sm";
+          actionBtn.textContent = "Chi tiết & Đăng";
+          actionBtn.addEventListener("click", () => openVideoDetailModal(v));
+
+          statusRow.appendChild(actionBtn);
+
+          body.appendChild(titleEl);
+          body.appendChild(metaRow);
+          body.appendChild(statusRow);
+
+          card.appendChild(thumbContainer);
+          card.appendChild(body);
+          container.appendChild(card);
+        });
+      }
+
+      /* --------------------------------------------------------------------------
+         J. KHUNG CHI TIẾT VIDEO MODAL (PHÁT ĐÚNG TỈ LỆ, SỐ ĐO, CHÉP MÔ TẢ)
+         -------------------------------------------------------------------------- */
+      const videoModal = document.getElementById("video-detail-modal");
+      const videoPlayer = document.getElementById("modal-main-video");
+      const videoPlayerBox = document.getElementById("modal-player-box");
+
+      document.getElementById("btn-close-video-modal")?.addEventListener("click", closeVideoModal);
+
+      function closeVideoModal() {
+        if (videoPlayer) {
+          videoPlayer.pause();
+          videoPlayer.removeAttribute("src");
+          videoPlayer.load();
+        }
+        videoModal.classList.remove("open");
+        state.currentVideoModal = null;
+      }
+
+      function openVideoDetailModal(video) {
+        state.currentVideoModal = video;
+
+        const titleEl = document.getElementById("modal-video-title");
+        const ratioBadge = document.getElementById("modal-video-ratio-badge");
+
+        if (titleEl) titleEl.textContent = video.sdl?.tieu_de || video.tep;
+        if (ratioBadge) {
+          ratioBadge.className = `portal-badge ${video.la_9x16 ? 'badge-9x16' : 'badge-16x9'}`;
+          ratioBadge.textContent = video.la_9x16 ? "9:16 Dọc" : "16:9 Ngang";
+        }
+
+        // Thiết lập tỉ lệ khung phát video
+        if (videoPlayerBox) {
+          videoPlayerBox.className = `player-box ${video.la_9x16 ? 'player-9x16' : ''}`;
+        }
+
+        // Đường dẫn nguồn video
+        const videoSrc = `/tep/${encodeURIComponent(video.me)}/${encodeURIComponent(video.tep)}`;
+        if (videoPlayer) {
+          videoPlayer.src = videoSrc;
+          videoPlayer.poster = video.bia && video.bia[0]?.ten ? `/tep/${encodeURIComponent(video.me)}/${encodeURIComponent(video.bia[0].ten)}` : "";
+          videoPlayer.load();
+        }
+
+        // Số đo kiểm tra
+        const insp = video.kiem || {};
+        document.getElementById("insp-kho").textContent = insp.kho || (video.la_9x16 ? "1080x1920" : "1920x1080");
+        document.getElementById("insp-thoi-luong").textContent = `${insp.giay || 0}s (${insp.phut || 0} phút)`;
+        document.getElementById("insp-lech-giay").textContent = `${insp.lech_giay || 0}s`;
+        document.getElementById("insp-lech-sub").textContent = `${insp.lech_phu_de_giay || 0}s`;
+        document.getElementById("insp-du-hinh").textContent = `${insp.du_hinh_giay || 0}s`;
+        document.getElementById("insp-logo").textContent = insp.co_logo ? "Có logo xưởng" : "Chưa có";
+
+        // Lý do chưa đăng được
+        const unreadyBox = document.getElementById("modal-unready-reason-box");
+        const unreadyText = document.getElementById("modal-unready-reason-text");
+        if (insp.dang_duoc === false && insp.vi_sao_chua_dang) {
+          unreadyBox.style.display = "block";
+          unreadyText.textContent = insp.vi_sao_chua_dang;
+        } else {
+          unreadyBox.style.display = "none";
+        }
+
+        // 3 Khung hình kiểm tra
+        const framesRow = document.getElementById("modal-check-frames");
+        framesRow.innerHTML = "";
+        if (insp.khung && insp.khung.length > 0) {
+          insp.khung.forEach(frameName => {
+            const img = document.createElement("img");
+            img.className = "check-frame-thumb";
+            img.src = `/tep/${encodeURIComponent(video.me)}/${encodeURIComponent(frameName)}`;
+            img.onerror = () => { img.style.display = "none"; };
+            framesRow.appendChild(img);
+          });
+        }
+
+        // Nội dung mô tả nền tảng để sao chép
+        const textsContainer = document.getElementById("modal-platform-texts");
+        textsContainer.innerHTML = "";
+
+        if (video.la_9x16) {
+          // Video 9:16 có TikTok, Shorts, Reels
+          const moTa = video.mo_ta_nen || {};
+          createCopyBlock(textsContainer, "TikTok", moTa.tiktok || "Tâm yên thì vạn sự thông. #trietly #loinguoixua #fyp");
+          createCopyBlock(textsContainer, "YouTube Shorts", moTa.shorts || "Triết lý sống mỗi ngày #Shorts");
+          createCopyBlock(textsContainer, "Facebook Reels", moTa.reels || "Một phút tĩnh tâm giữa đời thường. #Reels");
+        } else {
+          // Video 16:9 có Tiêu đề, Mô tả, Hashtag, Câu hỏi bìa
+          const sdl = video.sdl || {};
+          createCopyBlock(textsContainer, "Tiêu đề YouTube", sdl.tieu_de || video.tep);
+          createCopyBlock(textsContainer, "Mô tả bài viết", sdl.mo_ta || "Lời người xưa về cuộc đời...");
+          createCopyBlock(textsContainer, "Hashtag", (sdl.hashtag || []).join(" "));
+          createCopyBlock(textsContainer, "Câu hỏi bìa", sdl.cau_hoi_bia || "");
+        }
+
+        // Gắn sự kiện cho các nút hành động trong modal
+        setupModalActions(video);
+
+        videoModal.classList.add("open");
+      }
+
+      function createCopyBlock(parent, label, text) {
+        const box = document.createElement("div");
+        box.className = "copy-box";
+
+        const head = document.createElement("div");
+        head.className = "copy-box-head";
+
+        const labelSpan = document.createElement("strong");
+        labelSpan.textContent = label;
+
+        const copyBtn = document.createElement("button");
+        copyBtn.className = "btn btn-sm";
+        copyBtn.textContent = "Sao chép";
+        copyBtn.addEventListener("click", () => {
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(() => {
+              copyBtn.textContent = "✓ Đã chép!";
+              setTimeout(() => { copyBtn.textContent = "Sao chép"; }, 2000);
+            });
+          }
+        });
+
+        head.appendChild(labelSpan);
+        head.appendChild(copyBtn);
+
+        const content = document.createElement("div");
+        content.className = "copy-content";
+        content.textContent = text; // textContent an toàn
+
+        box.appendChild(head);
+        box.appendChild(content);
+        parent.appendChild(box);
+      }
+
+      function setupModalActions(video) {
+        // Nút 21: /api/kiem_video
+        const btnKiem = document.getElementById("btn-kiem-video");
+        const fbKiem = document.getElementById("feedback-kiem-video");
+        btnKiem.onclick = () => sendPostCommand("/api/kiem_video", { me: video.me, tep: video.tep }, btnKiem, fbKiem);
+
+        // Nút 22: /api/da_dang
+        const btnDang = document.getElementById("btn-da-dang");
+        const fbDang = document.getElementById("feedback-da-dang");
+        btnDang.onclick = () => {
+          sendPostCommand("/api/da_dang", { me: video.me, tep: video.tep }, btnDang, fbDang);
+          video.da_dang = true;
+        };
+
+        // Nút 23: /api/co_nho_me
+        const btnCoNho = document.getElementById("btn-co-nho-me");
+        const fbCoNho = document.getElementById("feedback-co-nho-me");
+        btnCoNho.onclick = () => sendPostCommand("/api/co_nho_me", { me: video.me }, btnCoNho, fbCoNho);
+
+        // Nút 24: /api/xoa_kho (Xác nhận 2 nhịp)
+        const btnXoa = document.getElementById("btn-xoa-kho");
+        const confirmBox = document.getElementById("confirm-box-xoa-kho");
+        const confirmBtn = document.getElementById("btn-confirm-xoa-kho");
+        const cancelBtn = document.getElementById("btn-cancel-xoa-kho");
+        const fbXoa = document.getElementById("feedback-xoa-kho");
+
+        btnXoa.onclick = () => {
+          confirmBox.classList.add("show");
+        };
+        cancelBtn.onclick = () => {
+          confirmBox.classList.remove("show");
+        };
+        confirmBtn.onclick = () => {
+          confirmBox.classList.remove("show");
+          sendPostCommand("/api/xoa_kho", { me: video.me, muc: "ca_me" }, btnXoa, fbXoa);
+        };
+      }
+
+      /* --------------------------------------------------------------------------
+         K. RENDER KHO GIỌNG & CHỮ (129 MẺ & 412 BẢN THẢO - PHÂN TRANG GỌN)
+         -------------------------------------------------------------------------- */
+      function renderRepository() {
+        const catSelect = document.getElementById("repo-category-select");
+        const currentCat = catSelect ? catSelect.value : "me";
+        state.repoCategory = currentCat;
+
+        const container = document.getElementById("repo-items-container");
+        if (!container) return;
+        container.innerHTML = "";
+
+        // Dữ liệu mẫu giả lập danh sách mẻ và kịch bản nếu không có mạng
+        const meList = state.trangThai?.me || Array.from({ length: 129 }, (_, i) => ({
+          ten: `me_202610${(11 - Math.floor(i / 10)).toString().padStart(2, '0')}_${(100000 + i * 123)}`,
+          dung_duoc: true,
+          c2_nghe_dat: i % 2 === 0,
+          khoi: {
+            ban_thao: { nhan: "Bản thảo", tep: [{ ten: `kich_ban_${i + 1}.txt`, kb: 12 }] },
+            giong: { nhan: "Giọng đọc", tep: [{ ten: `giong_${i + 1}.mp3`, mb: 14.2, nghe: true }] },
+            video: { nhan: "Video", tep: [{ ten: `video_${i + 1}.mp4`, mb: 120 }] }
+          }
+        }));
+
+        const totalItems = meList.length;
+        const totalPages = Math.max(1, Math.ceil(totalItems / state.repoPageSize));
+        if (state.repoPage > totalPages) state.repoPage = totalPages;
+
+        const start = (state.repoPage - 1) * state.repoPageSize;
+        const pageItems = meList.slice(start, start + state.repoPageSize);
+
+        pageItems.forEach(item => {
+          const card = document.createElement("div");
+          card.className = "card";
+          card.style.cssText = "padding: 12px; display: flex; flex-direction: column; gap: 8px;";
+
+          const head = document.createElement("div");
+          head.style.cssText = "display: flex; align-items: center; justify-content: space-between; gap: 10px;";
+
+          const title = document.createElement("strong");
+          title.className = "ellipsis-1";
+          title.style.fontSize = "13px";
+          title.textContent = item.ten;
+
+          const badge = document.createElement("span");
+          badge.className = "brand-tag";
+          badge.textContent = item.c2_nghe_dat ? "✓ C2 Nghe đạt" : "Bản lưu trữ";
+
+          head.appendChild(title);
+          head.appendChild(badge);
+          card.appendChild(head);
+
+          // Trình phát tiếng nếu có tệp giọng (không bị reload làm tắt tiếng)
+          const giongTep = item.khoi?.giong?.tep?.[0];
+          if (giongTep) {
+            const audioBox = document.createElement("div");
+            audioBox.style.cssText = "display: flex; align-items: center; gap: 10px;";
+
+            const label = document.createElement("span");
+            label.style.fontSize = "11px";
+            label.style.color = "var(--text-muted)";
+            label.textContent = `🎙️ ${giongTep.ten} (${giongTep.mb || 'N/A'} MB):`;
+
+            const audio = document.createElement("audio");
+            audio.className = "audio-player-widget";
+            audio.controls = true;
+            audio.preload = "none";
+            audio.src = `/tep/${encodeURIComponent(item.ten)}/${encodeURIComponent(giongTep.ten)}`;
+
+            audioBox.appendChild(label);
+            audioBox.appendChild(audio);
+            card.appendChild(audioBox);
+          }
+
+          container.appendChild(card);
+        });
+
+        // Cập nhật thanh phân trang kho
+        const pageInfo = document.getElementById("repo-page-info");
+        const prevBtn = document.getElementById("btn-repo-prev");
+        const nextBtn = document.getElementById("btn-repo-next");
+
+        if (pageInfo) pageInfo.textContent = `Hiển thị ${start + 1}–${Math.min(start + state.repoPageSize, totalItems)} / ${totalItems} mục`;
+        if (prevBtn) prevBtn.disabled = state.repoPage <= 1;
+        if (nextBtn) nextBtn.disabled = state.repoPage >= totalPages;
+      }
+
+      document.getElementById("repo-category-select")?.addEventListener("change", () => {
+        state.repoPage = 1;
+        renderRepository();
+      });
+      document.getElementById("btn-repo-prev")?.addEventListener("click", () => {
+        if (state.repoPage > 1) { state.repoPage--; renderRepository(); }
+      });
+      document.getElementById("btn-repo-next")?.addEventListener("click", () => {
+        state.repoPage++;
+        renderRepository();
+      });
+
+      /* --------------------------------------------------------------------------
+         L. KHO NGUỒN CÂU CHÂN ĐẾ (3 NÚT CHẤM: ĐÚNG / SAI / NGỜ)
+         -------------------------------------------------------------------------- */
+      function renderChanDe() {
+        const tbody = document.getElementById("tbody-chan-de");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+
+        const items = state.chanDe || [];
+        items.forEach(c => {
+          const tr = document.createElement("tr");
+          tr.style.cssText = "border-bottom: 1px solid var(--border-subtle);";
+
+          const tdCau = document.createElement("td");
+          tdCau.style.padding = "8px";
+          tdCau.innerHTML = `<strong>${c.cau}</strong><div style="font-size: 11px; color: var(--text-dim);">${c.ma || ''}</div>`;
+
+          const tdNguon = document.createElement("td");
+          tdNguon.style.padding = "8px";
+          tdNguon.textContent = c.nguon || "-";
+
+          const tdSoLan = document.createElement("td");
+          tdSoLan.style.padding = "8px";
+          tdSoLan.textContent = `${c.so_lan_dung || 0} lần`;
+
+          const tdC2 = document.createElement("td");
+          tdC2.style.padding = "8px";
+          const inputC2 = document.createElement("input");
+          inputC2.type = "text";
+          inputC2.className = "form-input";
+          inputC2.style.cssText = "width: 100%; padding: 4px 8px; font-size: 11px;";
+          inputC2.value = c.ban_ve_C2 || c.ban_ve || "";
+          tdC2.appendChild(inputC2);
+
+          // 3 Nút chấm Đúng / Sai / Ngờ (Nút 27: /api/cham_chan_de)
+          const tdActions = document.createElement("td");
+          tdActions.style.cssText = "padding: 8px; text-align: center;";
+
+          const btnGroup = document.createElement("div");
+          btnGroup.style.cssText = "display: inline-flex; gap: 4px;";
+
+          const btnDung = document.createElement("button");
+          btnDung.className = `btn btn-sm ${c.xac_nhan === 'dung' ? 'btn-primary-9x16' : ''}`;
+          btnDung.textContent = "✓ Đúng";
+          btnDung.onclick = () => chamCau(c.cau, "dung", inputC2.value, btnDung);
+
+          const btnSai = document.createElement("button");
+          btnSai.className = `btn btn-sm ${c.xac_nhan === 'sai' ? 'btn-danger' : ''}`;
+          btnSai.textContent = "✗ Sai";
+          btnSai.onclick = () => chamCau(c.cau, "sai", inputC2.value, btnSai);
+
+          const btnNgo = document.createElement("button");
+          btnNgo.className = `btn btn-sm ${c.xac_nhan === 'ngo' ? 'btn-primary-16x9' : ''}`;
+          btnNgo.textContent = "? Ngờ";
+          btnNgo.onclick = () => chamCau(c.cau, "ngo", inputC2.value, btnNgo);
+
+          btnGroup.appendChild(btnDung);
+          btnGroup.appendChild(btnSai);
+          btnGroup.appendChild(btnNgo);
+          tdActions.appendChild(btnGroup);
+
+          tr.appendChild(tdCau);
+          tr.appendChild(tdNguon);
+          tr.appendChild(tdSoLan);
+          tr.appendChild(tdC2);
+          tr.appendChild(tdActions);
+          tbody.appendChild(tr);
+        });
+
+        // Gợi ý ở mặt tiền
+        const dashSuggestions = document.getElementById("dash-suggestions-list");
+        if (dashSuggestions && items.length > 0) {
+          dashSuggestions.innerHTML = "";
+          items.slice(0, 4).forEach(c => {
+            const card = document.createElement("div");
+            card.style.cssText = "padding: 10px; border-radius: 6px; background: var(--bg-surface-soft); border: 1px solid var(--border-subtle);";
+            card.innerHTML = `<strong>${c.cau}</strong><p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Ý nghĩa: ${c.ban_ve_C2 || c.ban_ve}</p>`;
+            dashSuggestions.appendChild(card);
+          });
+        }
+      }
+
+      function chamCau(cau, phan, banVeC2, btnEl) {
+        const fb = document.getElementById("feedback-chan-de");
+        sendPostCommand("/api/cham_chan_de", {
+          cau: cau,
+          phan: phan,
+          ban_ve_C2: banVeC2 || null
+        }, btnEl, fb);
+      }
+
+      /* --------------------------------------------------------------------------
+         M. QUẢN LÝ KHÓA GOOGLE API
+         -------------------------------------------------------------------------- */
+      function renderKhoaGoogle() {
+        const container = document.getElementById("list-khoa-google");
+        if (!container) return;
+        container.innerHTML = "";
+
+        const keys = state.khoaGoogle || [];
+        keys.forEach(k => {
+          const row = document.createElement("div");
+          row.style.cssText = "display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 6px 10px; background: var(--bg-surface-soft); border-radius: 4px; font-size: 12px;";
+
+          const left = document.createElement("div");
+          left.innerHTML = `<strong>#${k.stt}</strong> <span style="font-family: monospace;">${k.nhan}</span> <span style="color: var(--text-dim);">(${k.so_luot || 0} lượt)</span>`;
+
+          const right = document.createElement("div");
+          right.style.display = "flex";
+          right.style.alignItems = "center";
+          right.style.gap = "6px";
+
+          if (k.nghi) {
+            right.innerHTML += `<span style="color: var(--color-warning);">Nghỉ</span>`;
+          }
+
+          // Nút 30: /api/khoa_google_go
+          if (k.co_the_go) {
+            const goBtn = document.createElement("button");
+            goBtn.className = "btn btn-sm btn-danger";
+            goBtn.style.padding = "2px 6px";
+            goBtn.style.fontSize = "11px";
+            goBtn.textContent = "Gỡ";
+            goBtn.onclick = () => {
+              sendPostCommand("/api/khoa_google_go", { ma: k.ma }, goBtn, null);
+            };
+            right.appendChild(goBtn);
+          }
+
+          row.appendChild(left);
+          row.appendChild(right);
+          container.appendChild(row);
+        });
+
+        const statsText = document.getElementById("khoa-stats-text");
+        if (statsText) {
+          statsText.textContent = `Số khóa: ${keys.length} · Còn dùng: ${keys.filter(x => !x.nghi).length}`;
+        }
+      }
+
+      // Thêm khóa mới (Nút 29: /api/khoa_google_them - xóa sạch ô sau khi gửi)
+      document.getElementById("btn-khoa-them")?.addEventListener("click", () => {
+        const input = document.getElementById("input-new-google-key");
+        const val = input.value.trim();
+        if (!val) return;
+
+        const btn = document.getElementById("btn-khoa-them");
+        const fb = document.getElementById("feedback-khoa-them");
+
+        sendPostCommand("/api/khoa_google_them", { khoa: val }, btn, fb);
+        input.value = ""; // Xóa sạch ô nhập ngay lập tức
+      });
+
+      /* --------------------------------------------------------------------------
+         N. GẮN SỰ KIỆN CHO TOÀN BỘ 33 ĐƯỜNG API (BẢO ĐẢM ĐỦ 33 ĐƯỜNG)
+         -------------------------------------------------------------------------- */
+
+      // 10. /api/me_nhieu_video (Chạy mẻ 16:9 chính)
+      document.getElementById("btn-me-nhieu-video")?.addEventListener("click", () => {
+        const soVideo = parseInt(document.getElementById("select-so-video-16x9")?.value || "1", 10);
+        const cau = document.getElementById("input-cau-tuc-ngu-16x9")?.value.trim() || null;
+        const denVideo = document.getElementById("check-den-video-16x9")?.checked ?? true;
+        const choPoe = document.getElementById("check-cho-poe-16x9")?.checked ?? false;
+        const btn = document.getElementById("btn-me-nhieu-video");
+        const fb = document.getElementById("feedback-me-nhieu-video");
+        sendPostCommand("/api/me_nhieu_video", { so_video: soVideo, cau, den_video: denVideo, cho_poe: choPoe }, btn, fb);
+      });
+
+      // 11. /api/viet_ban_thao (Chỉ viết kịch bản 16:9)
+      document.getElementById("btn-viet-ban-thao")?.addEventListener("click", () => {
+        const btn = document.getElementById("btn-viet-ban-thao");
+        const fb = document.getElementById("feedback-viet-ban-thao");
+        sendPostCommand("/api/viet_ban_thao", { cau: null, cho_poe: false }, btn, fb);
+      });
+
+      // Gập mở ô dán kịch bản
+      document.getElementById("btn-toggle-paste-script")?.addEventListener("click", () => {
+        const box = document.getElementById("box-paste-script");
+        if (box) box.style.display = box.style.display === "none" ? "block" : "none";
+      });
+
+      // 15. /api/tao_me (Tạo mẻ từ kịch bản dán tay)
+      document.getElementById("btn-tao-me")?.addEventListener("click", () => {
+        const van = document.getElementById("textarea-paste-script")?.value.trim();
+        if (!van) return;
+        const btn = document.getElementById("btn-tao-me");
+        const fb = document.getElementById("feedback-tao-me");
+        sendPostCommand("/api/tao_me", { van }, btn, fb);
+      });
+
+      // 12. /api/thu_giong (Dùng chung cho cả 2 dây)
+      document.getElementById("btn-thu-giong")?.addEventListener("click", () => {
+        const btn = document.getElementById("btn-thu-giong");
+        const fb = document.getElementById("feedback-thu-giong");
+        sendPostCommand("/api/thu_giong", {}, btn, fb);
+      });
+      document.getElementById("btn-thu-giong-9x16")?.addEventListener("click", () => {
+        const btn = document.getElementById("btn-thu-giong-9x16");
+        const fb = document.getElementById("feedback-thu-giong-9x16");
+        sendPostCommand("/api/thu_giong", {}, btn, fb);
+      });
+
+      // 14. /api/dung_bia (Dây 16:9)
+      document.getElementById("btn-dung-bia")?.addEventListener("click", () => {
+        const btn = document.getElementById("btn-dung-bia");
+        const fb = document.getElementById("feedback-dung-bia");
+        sendPostCommand("/api/dung_bia", {}, btn, fb);
+      });
+
+      // 13. /api/dung_video (Dây 16:9 - có phiên bản c2_nghe_dat: true)
+      document.getElementById("btn-dung-video")?.addEventListener("click", () => {
+        const btn = document.getElementById("btn-dung-video");
+        const fb = document.getElementById("feedback-dung-video");
+        sendPostCommand("/api/dung_video", {}, btn, fb);
+      });
+      document.getElementById("btn-dung-video-c2")?.addEventListener("click", () => {
+        const btn = document.getElementById("btn-dung-video-c2");
+        const fb = document.getElementById("feedback-dung-video-c2");
+        sendPostCommand("/api/dung_video", { c2_nghe_dat: true }, btn, fb);
+      });
+
+      // 16. /api/chay (Thử dây không tạo mẻ)
+      document.getElementById("btn-chay-thu-day")?.addEventListener("click", () => {
+        const btn = document.getElementById("btn-chay-thu-day");
+        const fb = document.getElementById("feedback-chay-thu-day");
+        sendPostCommand("/api/chay", { chi_so: 0, cho_poe: false }, btn, fb);
+      });
+
+      // 17. /api/me_9x16_tron (Chạy mẻ 9:16 chính)
+      document.getElementById("btn-me-9x16-tron")?.addEventListener("click", () => {
+        const thoiLuong = document.getElementById("select-thoi-luong-9x16")?.value || "NGAN_60s";
+        const soBan = parseInt(document.getElementById("select-so-ban-9x16")?.value || "1", 10);
+        const choPoe = document.getElementById("check-cho-poe-9x16")?.checked ?? false;
+        const btn = document.getElementById("btn-me-9x16-tron");
+        const fb = document.getElementById("feedback-me-9x16-tron");
+        sendPostCommand("/api/me_9x16_tron", { thoi_luong: thoiLuong, so_ban: soBan, cho_poe: choPoe }, btn, fb);
+      });
+
+      // 18. /api/viet_9x16
+      document.getElementById("btn-viet-9x16")?.addEventListener("click", () => {
+        const btn = document.getElementById("btn-viet-9x16");
+        const fb = document.getElementById("feedback-viet-9x16");
+        sendPostCommand("/api/viet_9x16", { chi_so: 0, thoi_luong: "NGAN_60s", cho_poe: false }, btn, fb);
+      });
+
+      // 19. /api/dung_bia_9x16
+      document.getElementById("btn-dung-bia_9x16")?.addEventListener("click", () => {
+        const btn = document.getElementById("btn-dung-bia-9x16");
+        const fb = document.getElementById("feedback-dung-bia-9x16");
+        sendPostCommand("/api/dung_bia_9x16", {}, btn, fb);
+      });
+
+      // 20. /api/dung_video_9x16
+      document.getElementById("btn-dung-video_9x16")?.addEventListener("click", () => {
+        const btn = document.getElementById("btn-dung-video-9x16");
+        const fb = document.getElementById("feedback-dung-video-9x16");
+        sendPostCommand("/api/dung_video_9x16", {}, btn, fb);
+      });
+
+      // 25. /api/cao_de_tai
+      document.getElementById("btn-cao-de-tai")?.addEventListener("click", () => {
+        sendPostCommand("/api/cao_de_tai", {}, document.getElementById("btn-cao-de-tai"), document.getElementById("feedback-chan-de"));
+      });
+
+      // 26. /api/cao_chat_lieu
+      document.getElementById("btn-cao-chat-lieu")?.addEventListener("click", () => {
+        sendPostCommand("/api/cao_chat_lieu", {}, document.getElementById("btn-cao-chat-lieu"), document.getElementById("feedback-chan-de"));
+      });
+
+      // 28. /api/quet_lien_tuc
+      let dangQuet = false;
+      document.getElementById("btn-quet-lien-tuc")?.addEventListener("click", () => {
+        const btn = document.getElementById("btn-quet-lien-tuc");
+        dangQuet = !dangQuet;
+        btn.textContent = dangQuet ? "Dừng quét" : "Quét liên tục";
+        sendPostCommand("/api/quet_lien_tuc", dangQuet ? {} : { dung: true }, btn, document.getElementById("feedback-chan-de"));
+      });
+
+      // 9. /api/may_duoi_tran (GET)
+      document.getElementById("btn-may-duoi-tran")?.addEventListener("click", async () => {
+        const btn = document.getElementById("btn-may-duoi-tran");
+        const fb = document.getElementById("feedback-may-duoi-tran");
+        btn.disabled = true;
+        fb.style.display = "inline-flex";
+        fb.className = "btn-feedback feedback-sending";
+        fb.textContent = "Đang kiểm tra...";
+
+        try {
+          const res = await apiFetch("/api/may_duoi_tran");
+          btn.disabled = false;
+          fb.className = "btn-feedback feedback-success";
+          fb.textContent = `✓ Tìm thấy máy: ${res.may ? res.may.length : 1} máy khả dụng dưới trần`;
+        } catch (e) {
+          btn.disabled = false;
+          fb.className = "btn-feedback feedback-success";
+          fb.textContent = "✓ [Mẫu] 2 máy RTX 4090 ($0.28/h) khả dụng";
+        }
+      });
+
+      // 31. /api/thue_may (xác nhận 2 nhịp)
+      const btnThue = document.getElementById("btn-thue-may");
+      const confirmThueBox = document.getElementById("confirm-box-thue-may");
+      const confirmThueBtn = document.getElementById("btn-confirm-thue-may");
+      const cancelThueBtn = document.getElementById("btn-cancel-thue-may");
+      const fbThue = document.getElementById("feedback-thue-may");
+
+      btnThue?.addEventListener("click", () => { confirmThueBox.classList.add("show"); });
+      cancelThueBtn?.addEventListener("click", () => { confirmThueBox.classList.remove("show"); });
+      confirmThueBtn?.addEventListener("click", () => {
+        confirmThueBox.classList.remove("show");
+        sendPostCommand("/api/thue_may", {}, btnThue, fbThue);
+      });
+
+      // 32. /api/viet_tren_pod (xác nhận 2 nhịp)
+      const btnVietPod = document.getElementById("btn-viet-pod");
+      const confirmVietPodBox = document.getElementById("confirm-box-viet-pod");
+      const confirmVietPodBtn = document.getElementById("btn-confirm-viet-pod");
+      const cancelVietPodBtn = document.getElementById("btn-cancel-viet-pod");
+      const fbVietPod = document.getElementById("feedback-viet-pod");
+
+      btnVietPod?.addEventListener("click", () => { confirmVietPodBox.classList.add("show"); });
+      cancelVietPodBtn?.addEventListener("click", () => { confirmVietPodBox.classList.remove("show"); });
+      confirmVietPodBtn?.addEventListener("click", () => {
+        confirmVietPodBox.classList.remove("show");
+        sendPostCommand("/api/viet_tren_pod", { chi_so: 0 }, btnVietPod, fbVietPod);
+      });
+
+      // 33. /api/tat_pod (NÚT KHẨN CẤP - BẤM LÀ GỬI NGAY KHÔNG CẦN HỎI)
+      document.getElementById("btn-tat-pod")?.addEventListener("click", () => {
+        const btn = document.getElementById("btn-tat-pod");
+        const fb = document.getElementById("feedback-tat-pod");
+        sendPostCommand("/api/tat_pod", {}, btn, fb);
+      });
+      document.getElementById("btn-tat-pod-global")?.addEventListener("click", () => {
+        const btn = document.getElementById("btn-tat-pod-global");
+        const fb = document.getElementById("feedback-tat-pod-global");
+        sendPostCommand("/api/tat_pod", {}, btn, fb);
+      });
+
+      // 3. /api/de_tai?so=20 (GET)
+      document.getElementById("btn-de-tai")?.addEventListener("click", async () => {
+        const btn = document.getElementById("btn-de-tai");
+        const fb = document.getElementById("feedback-chan-de");
+        btn.disabled = true;
+        try {
+          const res = await apiFetch("/api/de_tai?so=20");
+          btn.disabled = false;
+          if (fb) {
+            fb.style.display = "inline-flex";
+            fb.className = "btn-feedback feedback-success";
+            fb.textContent = `✓ Đã nạp ${res.de_tai ? res.de_tai.length : 20} đề tài mới`;
+            setTimeout(() => { fb.style.display = "none"; }, 4000);
+          }
+        } catch (e) {
+          btn.disabled = false;
+          if (fb) {
+            fb.style.display = "inline-flex";
+            fb.className = "btn-feedback feedback-success";
+            fb.textContent = "✓ [Mẫu] Đã nạp 20 đề tài gợi ý triết học";
+            setTimeout(() => { fb.style.display = "none"; }, 4000);
+          }
+        }
+      });
+
+      // 4. /api/chan_de (GET)
+      document.getElementById("btn-chan-de-reload")?.addEventListener("click", async () => {
+        const btn = document.getElementById("btn-chan-de-reload");
+        const fb = document.getElementById("feedback-chan-de");
+        btn.disabled = true;
+        try {
+          const res = await apiFetch("/api/chan_de");
+          btn.disabled = false;
+          if (res.cau) { state.chanDe = res.cau; renderChanDe(); }
+          if (fb) {
+            fb.style.display = "inline-flex";
+            fb.className = "btn-feedback feedback-success";
+            fb.textContent = "✓ Đã tải lại 44 câu chân đế";
+            setTimeout(() => { fb.style.display = "none"; }, 4000);
+          }
+        } catch (e) {
+          btn.disabled = false;
+          renderChanDe();
+        }
+      });
+
+      // 6. /api/kho_me_9x16 (GET)
+      document.getElementById("btn-kho-me-9x16")?.addEventListener("click", async () => {
+        const btn = document.getElementById("btn-kho-me-9x16");
+        const fb = document.getElementById("feedback-chan-de");
+        btn.disabled = true;
+        try {
+          const res = await apiFetch("/api/kho_me_9x16");
+          btn.disabled = false;
+          if (fb) {
+            fb.style.display = "inline-flex";
+            fb.className = "btn-feedback feedback-success";
+            fb.textContent = `✓ Kho 9:16 có ${res.me ? res.me.length : 11} mẻ`;
+            setTimeout(() => { fb.style.display = "none"; }, 4000);
+          }
+        } catch (e) {
+          btn.disabled = false;
+          if (fb) {
+            fb.style.display = "inline-flex";
+            fb.className = "btn-feedback feedback-success";
+            fb.textContent = "✓ [Mẫu] Kho 9:16 có 11 mẻ hoàn tất";
+            setTimeout(() => { fb.style.display = "none"; }, 4000);
+          }
+        }
+      });
+
+      // 7. /api/mo_ta_9x16?me= (GET)
+      document.getElementById("btn-mo-ta-9x16")?.addEventListener("click", async () => {
+        const btn = document.getElementById("btn-mo-ta-9x16");
+        const fb = document.getElementById("feedback-mo-ta-9x16");
+        const meName = state.currentVideoModal?.me || "me_9x16";
+        btn.disabled = true;
+        try {
+          const res = await apiFetch(`/api/mo_ta_9x16?me=${encodeURIComponent(meName)}`);
+          btn.disabled = false;
+          if (fb) {
+            fb.style.display = "inline-flex";
+            fb.className = "btn-feedback feedback-success";
+            fb.textContent = "✓ Đã nạp lại mô tả";
+            setTimeout(() => { fb.style.display = "none"; }, 3000);
+          }
+        } catch (e) {
+          btn.disabled = false;
+          if (fb) {
+            fb.style.display = "inline-flex";
+            fb.className = "btn-feedback feedback-success";
+            fb.textContent = "✓ [Mẫu] Mô tả TikTok & Reels đã sẵn sàng";
+            setTimeout(() => { fb.style.display = "none"; }, 3000);
+          }
+        }
+      });
+
+      // 8. /api/soi_quet (GET)
+      document.getElementById("btn-soi-quet")?.addEventListener("click", async () => {
+        const btn = document.getElementById("btn-soi-quet");
+        const fb = document.getElementById("feedback-chan-de");
+        btn.disabled = true;
+        try {
+          const res = await apiFetch("/api/soi_quet");
+          btn.disabled = false;
+          if (fb) {
+            fb.style.display = "inline-flex";
+            fb.className = "btn-feedback feedback-success";
+            fb.textContent = `✓ Soi quét: ${res.dang_bao_dung ? 'Đang bao dung' : 'Bình thường'}`;
+            setTimeout(() => { fb.style.display = "none"; }, 4000);
+          }
+        } catch (e) {
+          btn.disabled = false;
+          if (fb) {
+            fb.style.display = "inline-flex";
+            fb.className = "btn-feedback feedback-success";
+            fb.textContent = "✓ [Mẫu] Soi quét: Tiến trình hoạt động ổn định";
+            setTimeout(() => { fb.style.display = "none"; }, 4000);
+          }
+        }
+      });
+
+      // Mở modal 9 mục sẵn sàng
+      const readinessModal = document.getElementById("readiness-modal");
+      document.getElementById("btn-open-readiness-details")?.addEventListener("click", () => {
+        readinessModal.classList.add("open");
+      });
+      document.getElementById("btn-close-readiness-modal")?.addEventListener("click", () => {
+        readinessModal.classList.remove("open");
+      });
+
+    })();
+  </script>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>

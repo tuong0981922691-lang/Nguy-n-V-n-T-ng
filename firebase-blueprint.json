@@ -1,0 +1,65 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Thông tin hồ sơ người dùng quản lý xưởng",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "maxLength": 128, "description": "ID người dùng Firebase Auth" },
+        "email": { "type": "string", "maxLength": 256, "description": "Địa chỉ email của người dùng" },
+        "displayName": { "type": "string", "maxLength": 100, "description": "Tên hiển thị" },
+        "photoURL": { "type": "string", "maxLength": 500, "description": "Ảnh đại diện" },
+        "selectedTheme": { "type": "string", "enum": ["dark", "light", "sepia"], "description": "Giao diện ưa thích" },
+        "role": { "type": "string", "enum": ["owner", "collaborator", "viewer"], "description": "Vai trò trong xưởng" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Thời điểm tạo hồ sơ" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Thời điểm cập nhật hồ sơ" }
+      },
+      "required": ["uid", "email"]
+    },
+    "ProverbNote": {
+      "title": "ProverbNote",
+      "description": "Ghi chú và đánh giá câu tục ngữ triết lý của người dùng",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "description": "Mã định danh ghi chú" },
+        "userId": { "type": "string", "maxLength": 128, "description": "ID người dùng sở hữu" },
+        "cau": { "type": "string", "maxLength": 300, "description": "Câu tục ngữ" },
+        "danhGia": { "type": "string", "enum": ["dung", "sai", "ngo"], "description": "Đánh giá đúng, sai, hoặc ngờ" },
+        "ghiChuC2": { "type": "string", "maxLength": 1000, "description": "Ý tưởng bản vẽ C2" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Thời gian tạo" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Thời gian sửa" }
+      },
+      "required": ["id", "userId", "cau", "danhGia"]
+    },
+    "VideoBookmark": {
+      "title": "VideoBookmark",
+      "description": "Đánh dấu và theo dõi video trong kho",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128, "description": "Mã định danh đánh dấu" },
+        "userId": { "type": "string", "maxLength": 128, "description": "ID người dùng sở hữu" },
+        "me": { "type": "string", "maxLength": 100, "description": "Tên mẻ video" },
+        "tieuDe": { "type": "string", "maxLength": 300, "description": "Tiêu đề video" },
+        "la9x16": { "type": "boolean", "description": "Là video dọc 9:16 hay ngang 16:9" },
+        "ghiChu": { "type": "string", "maxLength": 500, "description": "Ghi chú cá nhân" },
+        "daDang": { "type": "boolean", "description": "Đã đăng lên mạng hay chưa" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Thời gian đánh dấu" }
+      },
+      "required": ["id", "userId", "me", "tieuDe"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Hồ sơ cá nhân và tùy chọn của từng người dùng"
+    },
+    "/users/{userId}/notes/{noteId}": {
+      "schema": { "$ref": "#/entities/ProverbNote" },
+      "description": "Danh sách ghi chú câu tục ngữ chân đế của người dùng"
+    },
+    "/users/{userId}/bookmarks/{bookmarkId}": {
+      "schema": { "$ref": "#/entities/VideoBookmark" },
+      "description": "Danh sách video đã đánh dấu và theo dõi"
+    }
+  }
+}
